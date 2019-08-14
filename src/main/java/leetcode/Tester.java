@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 /**
@@ -63,13 +64,16 @@ public class Tester {
                 else {
                     String methodName = (String) calls.get(i);
                     Method method = null;
-                    for (int j = 0; j < methods.length; j++) {
-                        if (methods[j].getName().equals(methodName)) {
-                            method = methods[j];
+                    for (Method tempMethod : methods) {
+                        if (Modifier.isPublic(tempMethod.getModifiers())
+                                && tempMethod.getName().equals(methodName)
+                                && tempMethod.getParameterCount() == param.length) {
+                            method = tempMethod;
                             method.setAccessible(true);
                             break;
                         }
                     }
+
                     Object[] paramConverted = converter.apply(solution, method, param);
                     long now = System.nanoTime();
                     Object actualResult = method.invoke(solution, paramConverted);
