@@ -368,10 +368,10 @@ public class _1157_H {
             int mid = (left + right + 1) / 2;
             int k = mid - left + 1;
             int maybeMajority = dividingTree.query(left, right, k);
-            // 二分查找值=maybeMajority的最左边的index
             List<Integer> indexes = valueIndexes.get(maybeMajority);
             int size = indexes.size();
             if (size >= threshold) {
+                // 二分查找值=maybeMajority的最左边的index
                 int leftI = findLeftEdge(indexes, left, 0, size - 1);
                 if (indexes.get(leftI) <= right) {
                     int rightI = leftI + threshold - 1;
