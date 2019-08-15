@@ -86,26 +86,11 @@ public class Tester {
                     Method method = null;
                     if (paramConverter != null) {
                         paramConverted = paramConverter.apply(solution, methodName, params);
-                        for (Method tempMethod : solution.getClass().getDeclaredMethods()) {
-                            if (Modifier.isPublic(tempMethod.getModifiers())
-                                    && tempMethod.getName().equals(methodName)
-                                    && tempMethod.getParameterCount() == paramConverted.length) {
-                                Object[] convertedArgs = convertArgs(tempMethod.getParameterTypes(), paramConverted);
-                                if (convertedArgs != null) {
-                                    paramConverted = convertedArgs;
-                                    method = tempMethod;
-                                    method.setAccessible(true);
-                                    break;
-                                }
-                            }
-                        }
                     }
-                    else {
-                        Object[] methodAndConvertedArgs = findMethodAndConvertArgs(solution, methodName, params);
-                        if (methodAndConvertedArgs != null) {
-                            method = (Method) methodAndConvertedArgs[0];
-                            paramConverted = (Object[]) methodAndConvertedArgs[1];
-                        }
+                    Object[] methodAndConvertedArgs = findMethodAndConvertArgs(solution, methodName, paramConverted == null ? params : paramConverted);
+                    if (methodAndConvertedArgs != null) {
+                        method = (Method) methodAndConvertedArgs[0];
+                        paramConverted = (Object[]) methodAndConvertedArgs[1];
                     }
 
                     if (method == null) {
