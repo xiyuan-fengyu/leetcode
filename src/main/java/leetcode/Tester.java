@@ -34,6 +34,10 @@ public class Tester {
         return test(callInputOutputs, null, null);
     }
 
+    public static <T> long test(String callInputOutputs, SolutionInit<T> solutionInit) {
+        return test(callInputOutputs, solutionInit, null);
+    }
+
     public static <T> long test(String callInputOutputs, SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter) {
         String[] split = callInputOutputs.split("\n");
         List calls = null;
