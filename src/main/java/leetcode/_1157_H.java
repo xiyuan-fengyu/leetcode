@@ -207,7 +207,9 @@ public class _1157_H {
 
     /**
      * 求区间内第K小的数
-     * 划分树 https://njzwj.github.io/2017/06/29/partition-tree-notes-1/
+     * 划分树
+     * https://njzwj.github.io/2017/06/29/partition-tree-notes-1/
+     * https://debug.fanzheng.org/post/merger-tree-and-parti-tree.html
      */
     private static class MajorityChecker {
 
