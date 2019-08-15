@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.List;
@@ -54,11 +55,12 @@ public class Tester {
         }
 
         long cost = 0;
+        String failedCaseInfo = null;
+        boolean allExecuted = false;
         try {
             System.out.println("test cases:\n" + callInputOutputs);
 
             T solution = null;
-            String failedCaseInfo = null;
             for (int i = 0; i < size; i++) {
                 Object[] params = ((List) paramsArr.get(i)).toArray();
                 if (i == 0) {
@@ -115,19 +117,26 @@ public class Tester {
                     }
                 }
             }
-            cost /= 1000000;
-            if (failedCaseInfo != null) {
-                System.out.println("\u001B[38;05;91m" + failedCaseInfo + "\u001B[0m\n");
-            }
-            else if (outputs != null) {
+            allExecuted = true;
+        }
+        catch (InvocationTargetException e) {
+            e.getCause().printStackTrace();
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        cost /= 1000000;
+        if (failedCaseInfo != null) {
+            System.out.println("\u001B[38;05;91m" + failedCaseInfo + "\u001B[0m\n");
+        }
+        else if (allExecuted) {
+            if (outputs != null) {
                 System.out.println("all cases passed, cost: " + cost + "ms\n");
             }
             else {
                 System.out.println("all cases executed, cost: " + cost + "ms\n");
             }
-        }
-        catch (Exception e) {
-            e.printStackTrace();
         }
         return cost;
     }

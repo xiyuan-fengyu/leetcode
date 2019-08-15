@@ -3,6 +3,7 @@ package leetcode;
 import com.xiyuan.templateString.EnableTemplateString;
 
 import java.util.*;
+import java.util.function.BiFunction;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
 
@@ -13,55 +14,11 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 @EnableTemplateString
 public class _1157_H {
 
-    private static class MajorityChecker {
-
-        private final List<Map<Integer, Integer>> blocks;
-
-        private final int leafBlockNum;
-
-        private final int leafBlockWidth;
-
-        public MajorityChecker(int[] arr) {
-            int leafBlockNum = 0;
-            for (int i = 5; i > 0; i--) {
-                leafBlockNum = (int) Math.pow(2, i);
-                if (arr.length > leafBlockNum * 100) {
-                    break;
-                }
-            }
-            this.leafBlockNum = leafBlockNum;
-            leafBlockWidth = (arr.length - 1) / leafBlockNum + 1;
-
-            int blockTotal = leafBlockNum * 2 - 1;
-            blocks = new ArrayList<>(blockTotal);
-            for (int i = 0; i < blockTotal; i++) {
-                blocks.add(new HashMap<>());
-            }
-
-            for (int i = 0; i < arr.length; i++) {
-                int leafIndex = i / leafBlockWidth;
-                int blockIndex = leafBlockNum - 1 + leafIndex;
-                int value = arr[i];
-                while (true) {
-                    Map<Integer, Integer> block = blocks.get(blockIndex);
-                    block.merge(value, 1, (oldV, newV) -> oldV + newV);
-                    if (blockIndex == 0) {
-                        break;
-                    }
-                    blockIndex = (blockIndex - 1) / 2;
-                }
-            }
-        }
-
-        public int query(int left, int right, int threshold) {
-
-            return -1;
-        }
-
-    }
-
     /**
-     * 该方案超时
+     * ！方案超时
+     * arr中，从左往右统计出每一个数字出现的索引数组，
+     * 对于一个数字的索引数组 indexes，通过二分查找找到大于等于left的indexL，
+     * 如果 indexL + threshold - 1 < indexes.length && indexes[indexL + threshold - 1] <= right，则这个数字满足要求
      */
     private static class MajorityChecker_1 {
 
@@ -122,6 +79,253 @@ public class _1157_H {
         }
 
     }
+
+    /**
+     * ！方案超时（比 MajorityChecker_1 更慢）
+     * 根据 arr 的长度将叶节点分为 2, 4, 8, 16 或 32，
+     * 然后遍历 arr 中的数字，增加所在叶节点块及其所有直接或间接父节点块中改数字的频数，
+     *
+     * 假设现在叶节点有32个分块，这32个块在所有分块中的编号为 31, 32, ... , 62
+     * 假设现在查询区间覆盖了 35,36,37,38,39,40,41,42` 几个块，
+     * 边界区间中，35区间全部覆盖，42`区间部分覆盖
+     * 这些块可以向上合并，
+     * 合并一次后
+     * 17,18,19,41,42`
+     * 再次合并
+     * 9,19,41,42`
+     * 统计出这几个块中各个数字的和即可得出答案
+     */
+    private static class MajorityChecker_2 {
+
+        private final int[] arr;
+
+        private final List<Map<Integer, Integer>> blocks;
+
+        private final int leafBlockNum;
+
+        private final int leafBlockWidth;
+
+        public MajorityChecker_2(int[] arr) {
+            this.arr = arr;
+
+            int leafBlockNum = 0;
+            for (int i = 5; i > 0; i--) {
+                leafBlockNum = (int) Math.pow(2, i);
+                if (arr.length > leafBlockNum * 100) {
+                    break;
+                }
+            }
+            this.leafBlockNum = leafBlockNum;
+            leafBlockWidth = (arr.length - 1) / leafBlockNum + 1;
+
+            int blockTotal = leafBlockNum * 2 - 1;
+            blocks = new ArrayList<>(blockTotal);
+            for (int i = 0; i < blockTotal; i++) {
+                blocks.add(new HashMap<>());
+            }
+
+            for (int i = 0; i < arr.length; i++) {
+                int leafIndex = i / leafBlockWidth;
+                int blockIndex = leafBlockNum - 1 + leafIndex;
+                int value = arr[i];
+                while (true) {
+                    Map<Integer, Integer> block = blocks.get(blockIndex);
+                    block.merge(value, 1, (oldV, newV) -> oldV + newV);
+                    if (blockIndex == 0) {
+                        break;
+                    }
+                    blockIndex = (blockIndex - 1) / 2;
+                }
+            }
+        }
+
+        public int query(int left, int right, int threshold) {
+            if (right - left + 1 < threshold) {
+                return -1;
+            }
+            else if (right == left && threshold == 1) {
+                return arr[left];
+            }
+
+            int leftLeafBlockI = left / leafBlockWidth;
+            int leftBlockI = leftLeafBlockI + leafBlockNum - 1;
+            boolean isLeftLeafBlockFull = left % leafBlockWidth == 0 && right >= (leftLeafBlockI + 1) * leafBlockWidth;
+            int rightLeafBlockI = right / leafBlockWidth;
+            int rightBlockI = rightLeafBlockI + leafBlockNum - 1;
+            boolean isRightLeafBlockFull = right % leafBlockWidth == leafBlockWidth - 1 && left <= rightLeafBlockI * leafBlockWidth;
+
+            Stack<Integer> blockIndexes = new Stack<>();
+            int[] counts = new int[20001];
+            if (!isLeftLeafBlockFull) {
+                for (int i = left, edge = Math.min((leftLeafBlockI + 1) * leafBlockWidth - 1, right); i <= edge; i++) {
+                    if (++counts[arr[i]] >= threshold) {
+                        return arr[i];
+                    }
+                }
+            }
+            else {
+                blockIndexes.push(leftBlockI);
+            }
+
+            if (!isRightLeafBlockFull && rightLeafBlockI != leftLeafBlockI) {
+                for (int i = rightLeafBlockI * leafBlockWidth; i <= right; i++) {
+                    if (++counts[arr[i]] >= threshold) {
+                        return arr[i];
+                    }
+                }
+            }
+
+            for (int i = leftBlockI + 1, edge = isRightLeafBlockFull ? rightBlockI : rightBlockI - 1; i <= edge; i++) {
+                int curBlockIndex = i;
+                while (!blockIndexes.isEmpty()) {
+                    int lastBlockIndex = blockIndexes.peek();
+                    if (lastBlockIndex + 1 == curBlockIndex && lastBlockIndex % 2 == 1) {
+                        curBlockIndex = (lastBlockIndex - 1) / 2;
+                        blockIndexes.pop();
+                    }
+                    else {
+                        break;
+                    }
+                }
+                blockIndexes.push(curBlockIndex);
+            }
+
+            while (!blockIndexes.isEmpty()) {
+                int blockIndex = blockIndexes.pop();
+                Map<Integer, Integer> block = blocks.get(blockIndex);
+                for (Map.Entry<Integer, Integer> entry : block.entrySet()) {
+                    int count = counts[entry.getKey()] = counts[entry.getKey()] + entry.getValue();
+                    if (count >= threshold) {
+                        return entry.getKey();
+                    }
+                }
+            }
+            return -1;
+        }
+
+    }
+
+    /**
+     * 求区间内第K小的数
+     * 划分树 https://njzwj.github.io/2017/06/29/partition-tree-notes-1/
+     */
+    private static class MajorityChecker {
+
+        private static final class DividingTree {
+
+            private final int[] orignal;
+
+            private final int[] sorted;
+
+            private final int[][] levels;
+
+            private final int[][] toLeftCountsForLevels;
+
+            public DividingTree(int[] arr) {
+                this.orignal = arr;
+                sorted = Arrays.copyOf(arr, arr.length);
+                Arrays.sort(sorted);
+                levels = new int[(int) Math.ceil(Math.log(arr.length) / Math.log(2))][arr.length];
+                toLeftCountsForLevels = new int[levels.length][arr.length];
+                build(0, arr.length - 1, 0);
+            }
+
+            private void build(int left, int right, int levelIndex) {
+                if (left == right) {
+                    return;
+                }
+
+                int[] preLevel = levelIndex == 0 ? orignal : levels[levelIndex - 1];
+                int[] level = levels[levelIndex];
+                int[] toLeftCounts = toLeftCountsForLevels[levelIndex];
+
+                int mid = (left + right + 1) >> 1; // 奇数个，取正中间；偶数个，取中间靠右边的
+                int midV = sorted[mid];
+
+                // 在排序后的数组中统计左半边有多少个等于midV，就知道应该放多少个值等于midV的到右边
+                int sameToMidAtLeftHalf = 0;
+                for (int i = left; i < mid; i++) {
+                    if (sorted[i] == midV) {
+                        sameToMidAtLeftHalf++;
+                    }
+                }
+
+                int toRightI = mid;
+                int toLeftCount = 0;
+                for (int i = left; i <= right; i++) {
+                    int value = preLevel[i];
+                    if (value == midV && sameToMidAtLeftHalf == 0) {
+                        level[toRightI++] = value;
+                        toLeftCounts[i] = toLeftCount;
+                    }
+                    else if (value > midV) {
+                        level[toRightI++] = value;
+                        toLeftCounts[i] = toLeftCount;
+                    }
+                    else {
+                        if (value == midV) {
+                            sameToMidAtLeftHalf--;
+                        }
+                        level[left + toLeftCount] = value;
+                        toLeftCounts[i] = ++toLeftCount;
+                    }
+                }
+                build(left, mid - 1, levelIndex + 1);
+                build(mid, right, levelIndex + 1);
+            }
+
+            /**
+             * 在 left ~ right 区间查找第 k 小的值，k从1开始计算
+             */
+            private int query(int left, int right, int k) {
+                int levelIndex = 0;
+                int nodeL = 0;
+                int nodeR = orignal.length - 1;
+                while (left != right) {
+                    int[] toLeftCounts = toLeftCountsForLevels[levelIndex];
+                    int moveToLeftOnLeftSide = left > 0 ? toLeftCounts[left - 1] : 0;
+                    int moveToLeft = toLeftCounts[right] - moveToLeftOnLeftSide;
+                    if (moveToLeft >= k) {
+                        // 继续在左边查找
+                        // 在left以作部分中，移到
+                        left = nodeL + moveToLeftOnLeftSide;
+                        right = nodeL + toLeftCounts[right] - 1;
+                        nodeR = (nodeL + nodeR - 1) / 2;
+                    }
+                    else {
+                        // 继续在右边查找
+                        int mid = (nodeL + nodeR + 1) / 2;
+                        left = mid + 1 + left - nodeL - moveToLeftOnLeftSide;
+                        right = mid + 1 + right - nodeL
+                    }
+                    levelIndex++;
+                }
+                return levels[levelIndex][left];
+            }
+
+        }
+
+        public static void main(String[] args) {
+            new DividingTree(new int[] {289,58,152,725,771,658,195,123,152,866,275,787,657,627,986,793,96,804,125,990,587,35,164,853,679,515,60,391,226,421,816,527});
+        }
+
+
+        private final int[] arr;
+
+        public MajorityChecker(int[] arr) {
+            this.arr = arr;
+        }
+
+        public int query(int left, int right, int threshold) {
+
+            return -1;
+        }
+
+    }
+
+    /**
+     * 划分树 https://oi-wiki.org/ds/dividing/
+     */
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
