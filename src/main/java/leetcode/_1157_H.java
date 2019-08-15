@@ -288,6 +288,7 @@ public class _1157_H {
                     if (moveToLeft >= k) {
                         // 继续在左边查找
                         // 在left以作部分中，移到
+                        // TODO
                         left = nodeL + moveToLeftOnLeftSide;
                         right = nodeL + toLeftCounts[right] - 1;
                         nodeR = (nodeL + nodeR - 1) / 2;
@@ -296,7 +297,7 @@ public class _1157_H {
                         // 继续在右边查找
                         int mid = (nodeL + nodeR + 1) / 2;
                         left = mid + 1 + left - nodeL - moveToLeftOnLeftSide;
-                        right = mid + 1 + right - nodeL
+                        right = mid + 1 + right - nodeL;
                     }
                     levelIndex++;
                 }
