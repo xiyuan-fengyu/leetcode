@@ -67,7 +67,7 @@ public class _1156_M {
         ["Solution","maxRepOpt1","maxRepOpt1","maxRepOpt1","maxRepOpt1","maxRepOpt1"]
         [[],["ababa"],["aaabaaa"],["aaabbaaa"],["aaaaa"],["abcdef"]]
         [null,3,6,4,5,1]
-        */), (solutionName, params) -> new Solution(), (solution, method, params) -> params);
+        */));
     }
 
 }

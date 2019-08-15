@@ -61,7 +61,7 @@ public class _1155_M {
         ["Solution","numRollsToTarget","numRollsToTarget","numRollsToTarget","numRollsToTarget","numRollsToTarget"]
         [[],[1, 6, 3],[2, 6, 7],[2, 5, 10],[1, 2, 3],[30, 30, 500]]
         [null,1,6,1,0,222616187]
-        */), (solutionName, params) -> new Solution(), (solution, method, params) -> params);
+        */));
     }
 
 }
