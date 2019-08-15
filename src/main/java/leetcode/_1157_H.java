@@ -3,7 +3,6 @@ package leetcode;
 import com.xiyuan.templateString.EnableTemplateString;
 
 import java.util.*;
-import java.util.function.BiFunction;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
 
@@ -15,7 +14,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 public class _1157_H {
 
     /**
-     * ！方案超时
+     * ！方案超时 168ms
      * arr中，从左往右统计出每一个数字出现的索引数组，
      * 对于一个数字的索引数组 indexes，通过二分查找找到大于等于left的indexL，
      * 如果 indexL + threshold - 1 < indexes.length && indexes[indexL + threshold - 1] <= right，则这个数字满足要求
@@ -81,7 +80,7 @@ public class _1157_H {
     }
 
     /**
-     * ！方案超时（比 MajorityChecker_1 更慢）
+     * ！方案超时 426ms
      * 根据 arr 的长度将叶节点分为 2, 4, 8, 16 或 32，
      * 然后遍历 arr 中的数字，增加所在叶节点块及其所有直接或间接父节点块中改数字的频数，
      *
@@ -205,8 +204,43 @@ public class _1157_H {
 
     }
 
+
     /**
-     * 312ms
+     * ！方案超时，但思路很简单 889ms
+     * 如果栈为空或栈顶等于当前数值，当前数值入栈；否者出栈。
+     * 在有主元素的情况下，入栈出栈相互抵消后，一定还有剩余，且剩余量 >=  threshold - (right -  left + 1 - threshold)。
+     * 这里相当于计算主元素最少的情况，主元素threshold个，其他元素总共right -  left + 1 - threshold。
+     */
+    private static class MajorityChecker_3 {
+
+        private final int[] arr;
+
+        public MajorityChecker_3(int[] arr) {
+            this.arr = arr;
+        }
+
+        public int query(int left, int right, int threshold) {
+            if (left == right) {
+                return threshold == 1 ? arr[left] : -1;
+            }
+
+            Stack<Integer> nums = new Stack<>();
+            for (int i = left; i <= right; i++) {
+                int num = arr[i];
+                if (nums.isEmpty() || num == nums.peek()) {
+                    nums.push(num);
+                }
+                else {
+                    nums.pop();
+                }
+            }
+            return nums.size() >= threshold - (right - left + 1 - threshold) ? nums.peek() : -1;
+        }
+    }
+
+    /**
+     * AC耗时312ms
+     * 测试用例耗时 10ms
      * 求区间内第K小的数
      * 划分树
      * https://njzwj.github.io/2017/06/29/partition-tree-notes-1/
