@@ -1,5 +1,6 @@
 package leetcode;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
@@ -7,6 +8,7 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -61,6 +63,7 @@ public class Tester {
         long cost = 0;
         String failedCaseInfo = null;
         boolean allExecuted = false;
+        List<Object> actualOutputs = new ArrayList<>();
         try {
             System.out.println("test cases:\n" + callInputOutputs);
 
@@ -74,6 +77,7 @@ public class Tester {
                     else {
                         solution = initSolution((String) calls.get(i), params);
                     }
+                    actualOutputs.add(null);
                 }
                 else {
                     String methodName = (String) calls.get(i);
@@ -119,6 +123,9 @@ public class Tester {
                             break;
                         }
                     }
+                    else {
+                        actualOutputs.add(actualResult);
+                    }
                 }
             }
             allExecuted = true;
@@ -139,7 +146,13 @@ public class Tester {
                 System.out.println("all cases passed, cost: " + cost + "ms\n");
             }
             else {
-                System.out.println("all cases executed, cost: " + cost + "ms\n");
+                String actualOutputsStr = "";
+                try {
+                    actualOutputsStr = objectMapper.writeValueAsString(actualOutputs) + "\n";
+                } catch (JsonProcessingException e) {
+                    e.printStackTrace();
+                }
+                System.out.println(actualOutputsStr +  "all cases executed, cost: " + cost + "ms\n");
             }
         }
         return cost;
