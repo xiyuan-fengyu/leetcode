@@ -242,7 +242,7 @@ public class _1157_H {
                 int mid = (left + right + 1) >> 1; // 奇数个，取正中间；偶数个，取中间靠右边的
                 int midV = sorted[mid];
 
-                // 在排序后的数组中统计左半边有多少个等于midV，就知道应该放多少个值等于midV的到右边
+                // 在排序后的数组中统计左半边有多少个等于midV，就知道应该放多少个midV到右边
                 int sameToMidAtLeftHalf = 0;
                 for (int i = left; i < mid; i++) {
                     if (sorted[i] == midV) {
