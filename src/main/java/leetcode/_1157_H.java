@@ -206,10 +206,14 @@ public class _1157_H {
     }
 
     /**
+     * 312ms
      * 求区间内第K小的数
      * 划分树
      * https://njzwj.github.io/2017/06/29/partition-tree-notes-1/
      * https://debug.fanzheng.org/post/merger-tree-and-parti-tree.html
+     *
+     * 划分树图解
+     * http://note.youdao.com/noteshare?id=487b4c930bdb30c59982098ae5f1c182&sub=43A8B3666AD14F538FDDDBA7310A6338
      */
     private static class MajorityChecker {
 
@@ -280,17 +284,21 @@ public class _1157_H {
              * 在 left ~ right 区间查找第 k 小的值，k从1开始计算
              */
             private int query(int left, int right, int k) {
-                int levelIndex = 0;
+                if (left == right) {
+                    return orignal[left];
+                }
+
                 int nodeL = 0;
                 int nodeR = orignal.length - 1;
-                while (left != right) {
+                int levelIndex = -1;
+                do {
+                    levelIndex++;
                     int[] toLeftCounts = toLeftCountsForLevels[levelIndex];
-                    int moveToLeftOnLeftSide = left > 0 ? toLeftCounts[left - 1] : 0;
+                    // (nodeL ~ right 这个区间移动到左子节点的个数) - (nodeL ~ left - 1 这个区间移动到左子节点的个数) = (left ~ right 这个区间移动到左子节点的个数)
+                    int moveToLeftOnLeftSide = left > nodeL ? toLeftCounts[left - 1] : 0;
                     int moveToLeft = toLeftCounts[right] - moveToLeftOnLeftSide;
                     if (moveToLeft >= k) {
                         // 继续在左边查找
-                        // 在left以作部分中，移到
-                        // TODO
                         left = nodeL + moveToLeftOnLeftSide;
                         right = nodeL + toLeftCounts[right] - 1;
                         nodeR = (nodeL + nodeR - 1) / 2;
@@ -298,41 +306,93 @@ public class _1157_H {
                     else {
                         // 继续在右边查找
                         int mid = (nodeL + nodeR + 1) / 2;
-                        left = mid + 1 + left - nodeL - moveToLeftOnLeftSide;
-                        right = mid + 1 + right - nodeL;
+                        k -= moveToLeft;
+                        left = mid + left - 1 - nodeL + 1 - moveToLeftOnLeftSide;
+                        right = mid + right - nodeL + 1 - toLeftCounts[right] - 1;
+                        nodeL = mid;
                     }
-                    levelIndex++;
-                }
+                } while (left != right);
                 return levels[levelIndex][left];
             }
 
         }
 
-        public static void main(String[] args) {
-            new DividingTree(new int[] {289,58,152,725,771,658,195,123,152,866,275,787,657,627,986,793,96,804,125,990,587,35,164,853,679,515,60,391,226,421,816,527});
-        }
+        private final DividingTree dividingTree;
 
-
-        private final int[] arr;
+        private Map<Integer, List<Integer>> valueIndexes = new HashMap<>();
 
         public MajorityChecker(int[] arr) {
-            this.arr = arr;
+            dividingTree = new DividingTree(arr);
+            for (int i = 0; i < arr.length; i++) {
+                int value = arr[i];
+                List<Integer> indexes = valueIndexes.computeIfAbsent(value, key -> new ArrayList<>());
+                indexes.add(i);
+            }
         }
 
         public int query(int left, int right, int threshold) {
-
+            int mid = (left + right + 1) / 2;
+            int k = mid - left + 1;
+            int maybeMajority = dividingTree.query(left, right, k);
+            // 二分查找值=maybeMajority的最左边的index
+            List<Integer> indexes = valueIndexes.get(maybeMajority);
+            int size = indexes.size();
+            if (size >= threshold) {
+                int leftI = findLeftEdge(indexes, left, 0, size - 1);
+                if (indexes.get(leftI) <= right) {
+                    int rightI = leftI + threshold - 1;
+                    if (rightI < size && indexes.get(rightI) <= right) {
+                        return maybeMajority;
+                    }
+                }
+            }
             return -1;
+        }
+
+        private int findLeftEdge(List<Integer> indexes, int target, int left, int right) {
+            if (left >= right) {
+                return indexes.get(right) >= target ? right : indexes.size();
+            }
+
+            int mid = (left + right) / 2;
+            int midV = indexes.get(mid);
+            if (midV == target) {
+                return mid;
+            }
+            else if (indexes.get(left) >= target) {
+                return left;
+            }
+            else if (midV > target) {
+                return findLeftEdge(indexes, target, left + 1, mid);
+            }
+            else {
+                return findLeftEdge(indexes, target, mid + 1, right);
+            }
         }
 
     }
 
-    /**
-     * 划分树 https://oi-wiki.org/ds/dividing/
-     */
+//    public static void main(String[] args) {
+//        MajorityChecker.DividingTree dividingTree = new MajorityChecker.DividingTree(new int[]{
+//                289, 58, 152, 725, 771,
+//                658, 195, 123, 152, 866,
+//                275, 787, 657, 627, 986,
+//                793, 96, 804, 125, 990,
+//                587, 35, 164, 853, 679,
+//                515, 60, 391, 226, 421,
+//                816, 527});
+//        System.out.println(dividingTree.query(25, 29, 2));
+//    }
 
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         long totalCost = Arrays.stream(new long[] {
+                Tester.test(r(/*
+                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+                [[[2,2,2,2,1,2,2,1,1,1,2,1,2,1,2,2]],[0,13,10],[4,12,8],[0,12,13],[4,14,10],[0,4,4],[13,13,1],[10,13,3],[4,7,3],[3,5,2],[6,14,7]]
+                [null,-1,-1,-1,-1,2,1,-1,-1,2,-1]
+                */)),
+
                 Tester.test(r(/*
                 ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
                 [[[1,1,2,2,2,1,2,2,1,1,2,1,2,1,1,2,2,1,2]],[1,16,10],[14,18,5],[10,10,1],[8,12,4],[3,7,4],[5,7,2],[0,8,8],[1,18,15],[8,9,2],[1,3,3]]
