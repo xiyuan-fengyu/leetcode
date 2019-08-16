@@ -13,6 +13,30 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 @EnableTemplateString
 public class _1157_H {
 
+    /*
+    1157. 子数组中占绝大多数的元素
+    实现一个 MajorityChecker 的类，它应该具有下述几个 API：
+
+    MajorityChecker(int[] arr) 会用给定的数组 arr 来构造一个 MajorityChecker 的实例。
+    int query(int left, int right, int threshold) 有这么几个参数：
+    0 <= left <= right < arr.length 表示数组 arr 的子数组的长度。
+    2 * threshold > right - left + 1，也就是说阈值 threshold 始终比子序列长度的一半还要大。
+    每次查询 query(...) 会返回在 arr[left], arr[left+1], ..., arr[right] 中至少出现阈值次数 threshold 的元素，如果不存在这样的元素，就返回 -1。
+
+    示例：
+    MajorityChecker majorityChecker = new MajorityChecker([1,1,2,2,1,1]);
+    majorityChecker.query(0,5,4); // 返回 1
+    majorityChecker.query(0,3,3); // 返回 -1
+    majorityChecker.query(2,3,2); // 返回 2
+
+    提示：
+    1 <= arr.length <= 20000
+    1 <= arr[i] <= 20000
+    对于每次查询，0 <= left <= right < len(arr)
+    对于每次查询，2 * threshold > right - left + 1
+    查询次数最多为 10000
+     */
+
     /**
      * 提交超时
      * 本地测试用例 168ms
@@ -309,35 +333,35 @@ public class _1157_H {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         Tester.test(
-//                r(/*
-//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-//                [[[2,2,2,2,1,2,2,1,1,1,2,1,2,1,2,2]],[0,13,10],[4,12,8],[0,12,13],[4,14,10],[0,4,4],[13,13,1],[10,13,3],[4,7,3],[3,5,2],[6,14,7]]
-//                [null,-1,-1,-1,-1,2,1,-1,-1,2,-1]
-//                */),
-//
-//                r(/*
-//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-//                [[[1,1,2,2,2,1,2,2,1,1,2,1,2,1,1,2,2,1,2]],[1,16,10],[14,18,5],[10,10,1],[8,12,4],[3,7,4],[5,7,2],[0,8,8],[1,18,15],[8,9,2],[1,3,3]]
-//                [null,-1,-1,2,-1,2,2,-1,-1,1,-1]
-//                */),
-//
-//                r(/*
-//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-//                [[[2,1,1,1,2,1,2,1,2,2,1,1,2]],[2,9,7],[9,11,2],[2,11,7],[3,4,2],[0,1,2],[6,9,3],[3,12,7],[3,10,6],[7,11,4],[0,6,4]]
-//                [null,-1,1,-1,-1,-1,2,-1,-1,-1,1]
-//                */),
-//
-//                r(/*
-//                ["MajorityChecker","query","query","query"]
-//                [[[1,1,2,2,1,1]],[0,5,4],[0,3,3],[2,3,2]]
-//                [null,1,-1,2]
-//                */),
-//
-//                r(/*
-//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-//                [[[2,2,1,2,1,2,2,1,1,2]],[2,5,4],[0,5,6],[0,1,2],[2,3,2],[6,6,1],[0,3,3],[4,9,6],[4,8,4],[5,9,5],[0,1,2]]
-//                [null,-1,-1,2,-1,2,2,-1,-1,-1,2]
-//                */),
+                r(/*
+                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+                [[[2,2,2,2,1,2,2,1,1,1,2,1,2,1,2,2]],[0,13,10],[4,12,8],[0,12,13],[4,14,10],[0,4,4],[13,13,1],[10,13,3],[4,7,3],[3,5,2],[6,14,7]]
+                [null,-1,-1,-1,-1,2,1,-1,-1,2,-1]
+                */),
+
+                r(/*
+                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+                [[[1,1,2,2,2,1,2,2,1,1,2,1,2,1,1,2,2,1,2]],[1,16,10],[14,18,5],[10,10,1],[8,12,4],[3,7,4],[5,7,2],[0,8,8],[1,18,15],[8,9,2],[1,3,3]]
+                [null,-1,-1,2,-1,2,2,-1,-1,1,-1]
+                */),
+
+                r(/*
+                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+                [[[2,1,1,1,2,1,2,1,2,2,1,1,2]],[2,9,7],[9,11,2],[2,11,7],[3,4,2],[0,1,2],[6,9,3],[3,12,7],[3,10,6],[7,11,4],[0,6,4]]
+                [null,-1,1,-1,-1,-1,2,-1,-1,-1,1]
+                */),
+
+                r(/*
+                ["MajorityChecker","query","query","query"]
+                [[[1,1,2,2,1,1]],[0,5,4],[0,3,3],[2,3,2]]
+                [null,1,-1,2]
+                */),
+
+                r(/*
+                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+                [[[2,2,1,2,1,2,2,1,1,2]],[2,5,4],[0,5,6],[0,1,2],[2,3,2],[6,6,1],[0,3,3],[4,9,6],[4,8,4],[5,9,5],[0,1,2]]
+                [null,-1,-1,2,-1,2,2,-1,-1,-1,2]
+                */),
 
                 r(/*
                 ["MajorityChecker","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query"]
