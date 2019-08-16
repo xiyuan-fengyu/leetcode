@@ -19,11 +19,11 @@ public class _1151_M {
                 countOfOne += data[i];
             }
             // 用一个大小为 countOfOne 的窗口从左往右移动，计算窗口内 1 的数量的最大值
-            int maxCountOfOneInWindow = 0;
+            int countOfOneInWindow = 0;
             for (int i = 0; i < countOfOne; i++) {
-                maxCountOfOneInWindow += data[i];
+                countOfOneInWindow += data[i];
             }
-            int countOfOneInWindow = maxCountOfOneInWindow;
+            int maxCountOfOneInWindow = countOfOneInWindow;
             for (int i = countOfOne; i < data.length; i++) {
                 // 窗口右边新增1
                 // 窗口左边移除1
