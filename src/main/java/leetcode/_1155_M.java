@@ -36,12 +36,12 @@ public class _1155_M {
                 // 因为在上一次迭代计算完成后，将 lastCache 的引用赋值给了 curCache，所以 curCache[i - 2], curCache[i - 1] 两项需要手动置零
                 curCache[i - 2] = curCache[i - 1] = 0;
                 for (int j = i, maxJ = Math.min(target, i * f); j <= maxJ; j++) {
-                    // f(d, f, target) = sum(f(d - 1, f, target - k)), 1 <= k <= f
+                    // F(d, f, target) = sum(F(d - 1, f, target - k)), 1 <= k <= f
                     // curCache 的计算方式，在 lastCache 上从左往右平移一个大小为f的窗口，计算窗口内数字的和
                     // curCache[j] = lastCache[j - 1 -f + 1] + lastCache[j - 1 -f + 1] + ... + lastCache[j - 1]
                     //             = (lastCache[j - 1 -f] + ... + lastCache[j - 1 - 1]) + lastCache[j - 1] - lastCache[j - 1 -f]
                     //             = curCache[j - 1] + lastCache[j - 1] - lastCache[j - 1 - f]
-                    curCache[j] = (lastCache[j - 1] + curCache[j - 1] - (j - 1 - f >= 0 ? lastCache[j - 1 - f] : 0)) % mod;
+                    curCache[j] = (curCache[j - 1] + lastCache[j - 1] - (j - 1 - f >= 0 ? lastCache[j - 1 - f] : 0)) % mod;
                     if (curCache[j] < 0) {
                         curCache[j] += mod;
                     }

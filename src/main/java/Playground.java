@@ -4,7 +4,8 @@
 public class Playground {
 
     public static void main(String[] args) {
-        System.out.println(Math.pow(26L, 10) - 1);
+        System.out.println((100 % 7 + 48 % 7 - 59 % 7));
+        System.out.println(((100 + 48 - 59) % 7));
     }
 
 }
