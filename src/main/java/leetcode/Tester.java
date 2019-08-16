@@ -146,32 +146,45 @@ public class Tester {
     @SuppressWarnings("unchecked")
     private static <T> T initSolution(String solutionName, Object[] params) throws Exception {
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
-        Class solutionClazz = null;
+        Class wrapperClass = null;
+        Class solutionClass = null;
         for (int i = 2; i < stackTrace.length; i++) {
             try {
-                solutionClazz = Class.forName(stackTrace[i].getClassName() + "$" + solutionName);
+                solutionClass = Class.forName(stackTrace[i].getClassName() + "$" + solutionName);
+                wrapperClass = Class.forName(stackTrace[i].getClassName());
                 break;
             } catch (ClassNotFoundException e) {
             }
         }
 
-        if (solutionClazz == null) {
+        if (wrapperClass == null || solutionClass == null) {
             throw new RuntimeException("cannot find a class for solution: " + solutionName
                     + ", you can set a lambda function to init the solution at the second parameter of Tester.test");
         }
 
-        Constructor[] constructors = solutionClazz.getDeclaredConstructors();
+        boolean isSolutionClassStatic = Modifier.isStatic(solutionClass.getModifiers());
+        Constructor[] constructors = solutionClass.getDeclaredConstructors();
         for (Constructor constructor : constructors) {
-            if (constructor.getParameterCount() == params.length) {
-                Object[] convertedArgs = convertArgs(constructor.getParameterTypes(), params);
-                if (convertedArgs != null) {
-                    constructor.setAccessible(true);
-                    return (T) constructor.newInstance(convertedArgs);
+            if (isSolutionClassStatic) {
+                if (constructor.getParameterCount() == params.length) {
+                    Object[] convertedArgs = convertArgs(constructor.getParameterTypes(), params);
+                    if (convertedArgs != null) {
+                        constructor.setAccessible(true);
+                        return (T) constructor.newInstance(convertedArgs);
+                    }
                 }
+            }
+            else if (constructor.getParameterCount() == params.length + 1
+                && constructor.getParameterTypes()[0] == wrapperClass) {
+                constructor.setAccessible(true);
+                Object[] newParams = new Object[params.length + 1];
+                newParams[0] = wrapperClass.newInstance();
+                System.arraycopy(params, 0, newParams, 1, params.length);
+                return (T) constructor.newInstance(newParams);
             }
         }
 
-        throw new RuntimeException("cannot match a constuctor for solution: " + solutionName + " in class " + solutionClazz.getName()
+        throw new RuntimeException("cannot match a constuctor for solution: " + solutionName + " in class " + solutionClass.getName()
                 + ", you can set a lambda function to init the solution at the second parameter of Tester.test");
     }
 

@@ -12,7 +12,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 @EnableTemplateString
 public class _1156_M {
 
-    private static class Solution {
+    class Solution {
 
         public int maxRepOpt1(String text) {
             int len = text.length();

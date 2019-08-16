@@ -20,7 +20,7 @@ public class _1157_H {
      * 对于一个数字的索引数组 indexes，通过二分查找找到大于等于left的indexL，
      * 如果 indexL + threshold - 1 < indexes.length && indexes[indexL + threshold - 1] <= right，则这个数字满足要求
      */
-    private static class MajorityChecker_1 {
+    class MajorityChecker_1 {
 
         private Map<Integer, List<Integer>> valueIndexes = new HashMap<>();
 
@@ -96,7 +96,7 @@ public class _1157_H {
      * 9,19,41,42`
      * 统计出这几个块中各个数字的和即可得出答案
      */
-    private static class MajorityChecker_2 {
+    class MajorityChecker_2 {
 
         private final int[] arr;
 
@@ -210,7 +210,7 @@ public class _1157_H {
      * 提交超时
      * 本地测试用例 37ms
      */
-    private static class MajorityChecker_3 {
+    class MajorityChecker_3 {
 
         private final int[] arr;
 
@@ -259,9 +259,9 @@ public class _1157_H {
      * 划分树图解
      * http://note.youdao.com/noteshare?id=487b4c930bdb30c59982098ae5f1c182&sub=43A8B3666AD14F538FDDDBA7310A6338
      */
-    private static class MajorityChecker {
+    class MajorityChecker {
 
-        private static final class DividingTree {
+        private final class DividingTree {
 
             private final int[] orignal;
 

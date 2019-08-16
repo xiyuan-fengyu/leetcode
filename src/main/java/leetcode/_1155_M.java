@@ -14,7 +14,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 @EnableTemplateString
 public class _1155_M {
 
-    private static class Solution {
+    class Solution {
 
         public int numRollsToTarget(int d, int f, int target) {
             if (d == 1) {

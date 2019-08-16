@@ -11,9 +11,9 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 @EnableTemplateString
 public class _1154_E {
 
-    private static class Solution {
+    class Solution {
 
-        private static final int[] daysOfMonth = {
+        private final int[] daysOfMonth = {
                 0, 31, 59, 90, 120, 151, 181, 212,
                 243, 273, 304, 334
         };
