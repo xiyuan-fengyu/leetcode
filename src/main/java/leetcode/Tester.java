@@ -9,7 +9,10 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Created by xiyuan_fengyu on 2019/8/14 12:56.
@@ -69,7 +72,8 @@ public class Tester {
 
             T solution = null;
             for (int i = 0; i < size; i++) {
-                Object[] params = ((List) paramsArr.get(i)).toArray();
+                Object objI = paramsArr.get(i);
+                Object[] params = objI instanceof List ? ((List) objI).toArray() : new Object[] {objI};
                 if (i == 0) {
                     if (solutionInit != null) {
                         solution = solutionInit.apply((String) calls.get(i), params);
@@ -103,8 +107,12 @@ public class Tester {
                     if (outputs != null) {
                         String actualResultStr = objectMapper.writeValueAsString(actualResult);
                         String expectResultStr = objectMapper.writeValueAsString(outputs.get(i));
+                        StringBuilder paramsStr = new StringBuilder();
+                        for (int j = 0; j < params.length; j++) {
+                            paramsStr.append(j == 0 ? "" : ", ").append(objectMapper.writeValueAsString(params[j]));
+                        }
                         if (!actualResultStr.equals(expectResultStr)) {
-                            failedCaseInfo = "case " + i + " check failed: " + objectMapper.writeValueAsString(params) + " expect: " + expectResultStr + " actual: " + actualResultStr;
+                            failedCaseInfo = "case " + i + " check failed: " + methodName + "(" + paramsStr + ") expect: " + expectResultStr + " actual: " + actualResultStr;
                             break;
                         }
                     }
@@ -162,33 +170,59 @@ public class Tester {
                     + ", you can set a lambda function to init the solution at the second parameter of Tester.test");
         }
 
-        boolean isSolutionClassStatic = Modifier.isStatic(solutionClass.getModifiers());
-        Constructor[] constructors = solutionClass.getDeclaredConstructors();
-        for (Constructor constructor : constructors) {
-            if (isSolutionClassStatic) {
-                if (constructor.getParameterCount() == params.length) {
-                    Object[] convertedArgs = convertArgs(constructor.getParameterTypes(), params);
-                    if (convertedArgs != null) {
-                        constructor.setAccessible(true);
-                        return (T) constructor.newInstance(convertedArgs);
-                    }
-                }
-            }
-            else if (constructor.getParameterCount() == params.length + 1
-                && constructor.getParameterTypes()[0] == wrapperClass) {
-                constructor.setAccessible(true);
-                Object[] newParams = new Object[params.length + 1];
-                newParams[0] = wrapperClass.newInstance();
-                System.arraycopy(params, 0, newParams, 1, params.length);
-                return (T) constructor.newInstance(newParams);
-            }
+        T solution = tryInitSolution(wrapperClass, solutionClass, params);
+        if (solution == null) {
+            // 尝试将 params 当成一个参数来初始化
+            solution = tryInitSolution(wrapperClass, solutionClass, new Object[] {params});
+        }
+        if (solution != null) {
+            return solution;
         }
 
         throw new RuntimeException("cannot match a constuctor for solution: " + solutionName + " in class " + solutionClass.getName()
                 + ", you can set a lambda function to init the solution at the second parameter of Tester.test");
     }
 
+    @SuppressWarnings("unchecked")
+    private static <T> T tryInitSolution(Class<?> wrapperClass, Class<?> solutionClass, Object[] params) {
+        try {
+            boolean isSolutionClassStatic = Modifier.isStatic(solutionClass.getModifiers());
+            Constructor[] constructors = solutionClass.getDeclaredConstructors();
+            for (Constructor constructor : constructors) {
+                if (isSolutionClassStatic) {
+                    if (constructor.getParameterCount() == params.length) {
+                        Object[] convertedArgs = convertArgs(constructor.getParameterTypes(), params);
+                        if (convertedArgs != null) {
+                            constructor.setAccessible(true);
+                            return (T) constructor.newInstance(convertedArgs);
+                        }
+                    }
+                }
+                else if (constructor.getParameterCount() == params.length + 1
+                        && constructor.getParameterTypes()[0] == wrapperClass) {
+                    constructor.setAccessible(true);
+                    Object[] newParams = new Object[params.length + 1];
+                    newParams[0] = wrapperClass.newInstance();
+                    System.arraycopy(params, 0, newParams, 1, params.length);
+                    return (T) constructor.newInstance(newParams);
+                }
+            }
+        }
+        catch (Exception e) {
+        }
+        return null;
+    }
+
     private static <T> Object[] findMethodAndConvertArgs(T solution, String methodName, Object[] params) {
+        Object[] methodAndConvertArgs = tryFindMethodAndConvertArgs(solution, methodName, params);
+        if (methodAndConvertArgs != null) {
+            return methodAndConvertArgs;
+        }
+        // 将 params 当成一个参数来尝试
+        return tryFindMethodAndConvertArgs(solution, methodName, new Object[]{params});
+    }
+
+    private static <T> Object[] tryFindMethodAndConvertArgs(T solution, String methodName, Object[] params) {
         for (Method tempMethod : solution.getClass().getDeclaredMethods()) {
             if (Modifier.isPublic(tempMethod.getModifiers())
                     && tempMethod.getName().equals(methodName)

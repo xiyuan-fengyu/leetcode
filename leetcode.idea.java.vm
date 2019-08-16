@@ -1,0 +1,22 @@
+#if (${PACKAGE_NAME} && ${PACKAGE_NAME} != "")package ${PACKAGE_NAME};#end
+
+import com.xiyuan.templateString.EnableTemplateString;
+
+import static com.xiyuan.templateString.TemplateString.S.r;
+#parse("File Header.java")
+@EnableTemplateString
+public class ${NAME} {
+
+    class Solution {
+
+    }
+
+    public static void main(String[] args) {
+        Tester.test(r(/*
+        ["Solution"]
+        [[]]
+        [null]
+        */));
+    }
+
+}

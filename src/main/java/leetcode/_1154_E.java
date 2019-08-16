@@ -55,7 +55,7 @@ public class _1154_E {
     public static void main(String[] args) {
         Tester.test(r(/*
         ["Solution","dayOfYear","dayOfYear","dayOfYear","dayOfYear","dayOfYear","dayOfYear"]
-        [[],["2019-01-09"],["2019-02-10"],["2003-03-01"],["2004-03-01"],["2016-02-29"],["1900-03-01"]]
+        [[],"2019-01-09","2019-02-10","2003-03-01","2004-03-01","2016-02-29","1900-03-01"]
         [null,9,41,60,61,60,60]
         */));
     }
