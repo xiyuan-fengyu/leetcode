@@ -12,11 +12,13 @@ public class ${NAME} {
     }
 
     public static void main(String[] args) {
-        Tester.test(r(/*
-        ["Solution"]
-        [[]]
-        [null]
-        */));
+        Tester.test(
+                r(/*
+                ["Solution"]
+                [[]]
+                [null]
+                */)
+        );
     }
 
 }

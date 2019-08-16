@@ -178,7 +178,7 @@ public class Tester {
 
         if (wrapperClass == null || solutionClass == null) {
             throw new RuntimeException("cannot find a class for solution: " + solutionName
-                    + ", you can set a lambda function to init the solution at the second parameter of Tester.test");
+                    + ", you can set a lambda function to init the solution at the first parameter of Tester.test");
         }
 
         T solution = tryInitSolution(wrapperClass, solutionClass, params);

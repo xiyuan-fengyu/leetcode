@@ -10,6 +10,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
 
 /**
  * Created by xiyuan_fengyu on 2019/8/16 11:01.
+ * https://leetcode-cn.com/contest/biweekly-contest-6/problems/analyze-user-website-visit-pattern/
  */
 @EnableTemplateString
 public class _1152_M {

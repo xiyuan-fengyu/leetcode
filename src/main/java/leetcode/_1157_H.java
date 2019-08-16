@@ -82,139 +82,13 @@ public class _1157_H {
 
     /**
      * 提交超时
-     * 本地测试用例 426ms
-     * 根据 arr 的长度将叶节点分为 2, 4, 8, 16 或 32，
-     * 然后遍历 arr 中的数字，增加所在叶节点块及其所有直接或间接父节点块中改数字的频数，
-     *
-     * 假设现在叶节点有32个分块，这32个块在所有分块中的编号为 31, 32, ... , 62
-     * 假设现在查询区间覆盖了 35,36,37,38,39,40,41,42` 几个块，
-     * 边界区间中，35区间全部覆盖，42`区间部分覆盖
-     * 这些块可以向上合并，
-     * 合并一次后
-     * 17,18,19,41,42`
-     * 再次合并
-     * 9,19,41,42`
-     * 统计出这几个块中各个数字的和即可得出答案
+     * 本地测试用例 37ms
      */
     class MajorityChecker_2 {
 
         private final int[] arr;
 
-        private final List<Map<Integer, Integer>> blocks;
-
-        private final int leafBlockNum;
-
-        private final int leafBlockWidth;
-
         public MajorityChecker_2(int[] arr) {
-            this.arr = arr;
-
-            int leafBlockNum = 0;
-            for (int i = 5; i > 0; i--) {
-                leafBlockNum = (int) Math.pow(2, i);
-                if (arr.length > leafBlockNum * 100) {
-                    break;
-                }
-            }
-            this.leafBlockNum = leafBlockNum;
-            leafBlockWidth = (arr.length - 1) / leafBlockNum + 1;
-
-            int blockTotal = leafBlockNum * 2 - 1;
-            blocks = new ArrayList<>(blockTotal);
-            for (int i = 0; i < blockTotal; i++) {
-                blocks.add(new HashMap<>());
-            }
-
-            for (int i = 0; i < arr.length; i++) {
-                int leafIndex = i / leafBlockWidth;
-                int blockIndex = leafBlockNum - 1 + leafIndex;
-                int value = arr[i];
-                while (true) {
-                    Map<Integer, Integer> block = blocks.get(blockIndex);
-                    block.merge(value, 1, (oldV, newV) -> oldV + newV);
-                    if (blockIndex == 0) {
-                        break;
-                    }
-                    blockIndex = (blockIndex - 1) / 2;
-                }
-            }
-        }
-
-        public int query(int left, int right, int threshold) {
-            if (right - left + 1 < threshold) {
-                return -1;
-            }
-            else if (right == left && threshold == 1) {
-                return arr[left];
-            }
-
-            int leftLeafBlockI = left / leafBlockWidth;
-            int leftBlockI = leftLeafBlockI + leafBlockNum - 1;
-            boolean isLeftLeafBlockFull = left % leafBlockWidth == 0 && right >= (leftLeafBlockI + 1) * leafBlockWidth;
-            int rightLeafBlockI = right / leafBlockWidth;
-            int rightBlockI = rightLeafBlockI + leafBlockNum - 1;
-            boolean isRightLeafBlockFull = right % leafBlockWidth == leafBlockWidth - 1 && left <= rightLeafBlockI * leafBlockWidth;
-
-            Stack<Integer> blockIndexes = new Stack<>();
-            int[] counts = new int[20001];
-            if (!isLeftLeafBlockFull) {
-                for (int i = left, edge = Math.min((leftLeafBlockI + 1) * leafBlockWidth - 1, right); i <= edge; i++) {
-                    if (++counts[arr[i]] >= threshold) {
-                        return arr[i];
-                    }
-                }
-            }
-            else {
-                blockIndexes.push(leftBlockI);
-            }
-
-            if (!isRightLeafBlockFull && rightLeafBlockI != leftLeafBlockI) {
-                for (int i = rightLeafBlockI * leafBlockWidth; i <= right; i++) {
-                    if (++counts[arr[i]] >= threshold) {
-                        return arr[i];
-                    }
-                }
-            }
-
-            for (int i = leftBlockI + 1, edge = isRightLeafBlockFull ? rightBlockI : rightBlockI - 1; i <= edge; i++) {
-                int curBlockIndex = i;
-                while (!blockIndexes.isEmpty()) {
-                    int lastBlockIndex = blockIndexes.peek();
-                    if (lastBlockIndex + 1 == curBlockIndex && lastBlockIndex % 2 == 1) {
-                        curBlockIndex = (lastBlockIndex - 1) / 2;
-                        blockIndexes.pop();
-                    }
-                    else {
-                        break;
-                    }
-                }
-                blockIndexes.push(curBlockIndex);
-            }
-
-            while (!blockIndexes.isEmpty()) {
-                int blockIndex = blockIndexes.pop();
-                Map<Integer, Integer> block = blocks.get(blockIndex);
-                for (Map.Entry<Integer, Integer> entry : block.entrySet()) {
-                    int count = counts[entry.getKey()] = counts[entry.getKey()] + entry.getValue();
-                    if (count >= threshold) {
-                        return entry.getKey();
-                    }
-                }
-            }
-            return -1;
-        }
-
-    }
-
-    /**
-     * 提交超时
-     * 本地测试用例 37ms
-     */
-    class MajorityChecker_3 {
-
-        private final int[] arr;
-
-        public MajorityChecker_3(int[] arr) {
             this.arr = arr;
         }
 
@@ -377,7 +251,9 @@ public class _1157_H {
         public int query(int left, int right, int threshold) {
             int mid = (left + right + 1) / 2;
             int k = mid - left + 1;
+//            long now = System.nanoTime();
             int maybeMajority = dividingTree.query(left, right, k);
+//            System.out.println((System.nanoTime() - now) + "us");
             List<Integer> indexes = valueIndexes.get(maybeMajority);
             int size = indexes.size();
             if (size >= threshold) {
@@ -386,10 +262,12 @@ public class _1157_H {
                 if (indexes.get(leftI) <= right) {
                     int rightI = leftI + threshold - 1;
                     if (rightI < size && indexes.get(rightI) <= right) {
+//                        System.out.println((System.nanoTime() - now) + "us\n");
                         return maybeMajority;
                     }
                 }
             }
+//            System.out.println((System.nanoTime() - now) + "us\n");
             return -1;
         }
 
@@ -431,35 +309,35 @@ public class _1157_H {
     @SuppressWarnings("unchecked")
     public static void main(String[] args) {
         Tester.test(
-                r(/*
-                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-                [[[2,2,2,2,1,2,2,1,1,1,2,1,2,1,2,2]],[0,13,10],[4,12,8],[0,12,13],[4,14,10],[0,4,4],[13,13,1],[10,13,3],[4,7,3],[3,5,2],[6,14,7]]
-                [null,-1,-1,-1,-1,2,1,-1,-1,2,-1]
-                */),
-
-                r(/*
-                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-                [[[1,1,2,2,2,1,2,2,1,1,2,1,2,1,1,2,2,1,2]],[1,16,10],[14,18,5],[10,10,1],[8,12,4],[3,7,4],[5,7,2],[0,8,8],[1,18,15],[8,9,2],[1,3,3]]
-                [null,-1,-1,2,-1,2,2,-1,-1,1,-1]
-                */),
-
-                r(/*
-                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-                [[[2,1,1,1,2,1,2,1,2,2,1,1,2]],[2,9,7],[9,11,2],[2,11,7],[3,4,2],[0,1,2],[6,9,3],[3,12,7],[3,10,6],[7,11,4],[0,6,4]]
-                [null,-1,1,-1,-1,-1,2,-1,-1,-1,1]
-                */),
-
-                r(/*
-                ["MajorityChecker","query","query","query"]
-                [[[1,1,2,2,1,1]],[0,5,4],[0,3,3],[2,3,2]]
-                [null,1,-1,2]
-                */),
-
-                r(/*
-                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
-                [[[2,2,1,2,1,2,2,1,1,2]],[2,5,4],[0,5,6],[0,1,2],[2,3,2],[6,6,1],[0,3,3],[4,9,6],[4,8,4],[5,9,5],[0,1,2]]
-                [null,-1,-1,2,-1,2,2,-1,-1,-1,2]
-                */),
+//                r(/*
+//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+//                [[[2,2,2,2,1,2,2,1,1,1,2,1,2,1,2,2]],[0,13,10],[4,12,8],[0,12,13],[4,14,10],[0,4,4],[13,13,1],[10,13,3],[4,7,3],[3,5,2],[6,14,7]]
+//                [null,-1,-1,-1,-1,2,1,-1,-1,2,-1]
+//                */),
+//
+//                r(/*
+//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+//                [[[1,1,2,2,2,1,2,2,1,1,2,1,2,1,1,2,2,1,2]],[1,16,10],[14,18,5],[10,10,1],[8,12,4],[3,7,4],[5,7,2],[0,8,8],[1,18,15],[8,9,2],[1,3,3]]
+//                [null,-1,-1,2,-1,2,2,-1,-1,1,-1]
+//                */),
+//
+//                r(/*
+//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+//                [[[2,1,1,1,2,1,2,1,2,2,1,1,2]],[2,9,7],[9,11,2],[2,11,7],[3,4,2],[0,1,2],[6,9,3],[3,12,7],[3,10,6],[7,11,4],[0,6,4]]
+//                [null,-1,1,-1,-1,-1,2,-1,-1,-1,1]
+//                */),
+//
+//                r(/*
+//                ["MajorityChecker","query","query","query"]
+//                [[[1,1,2,2,1,1]],[0,5,4],[0,3,3],[2,3,2]]
+//                [null,1,-1,2]
+//                */),
+//
+//                r(/*
+//                ["MajorityChecker","query","query","query","query","query","query","query","query","query","query"]
+//                [[[2,2,1,2,1,2,2,1,1,2]],[2,5,4],[0,5,6],[0,1,2],[2,3,2],[6,6,1],[0,3,3],[4,9,6],[4,8,4],[5,9,5],[0,1,2]]
+//                [null,-1,-1,2,-1,2,2,-1,-1,-1,2]
+//                */),
 
                 r(/*
                 ["MajorityChecker","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query","query"]
