@@ -3,6 +3,8 @@ package leetcode;
 import com.xiyuan.templateString.EnableTemplateString;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
 
@@ -26,39 +28,49 @@ public class _1152_M {
 
             @Override
             public int compareTo(Object o) {
-                return time;
+                return time - ((Recode) o).time;
             }
 
         }
 
+        /**
+         * 要点
+         * 减少排序次数
+         * 由于网站地址有限，所以可以按照字典顺序编号，在计算三个网站的组合key时，通过编号来计算唯一key，避免用字符串拼接作为key，这样会耗费大量时间
+         * 另外jdk8中提供的map相关的新的API中，有些参数列表中有Function参数，例如 merge， computeIfAbsent，通过lambda来构建Function参数时，会产生临时类和临时类实例，导致速度大大下降，尽量不要使用这些API，还是乖乖使用老办法
+         */
         public List<String> mostVisitedPattern(String[] username, int[] timestamp, String[] website) {
-            Recode[] recodes = new Recode[username.length];
-            Set<String> pathSet = new TreeSet<>();
+            Recode[] allRecodes = new Recode[username.length];
             for (int i = 0; i < username.length; i++) {
-                recodes[i] = new Recode(username[i], timestamp[i], website[i]);
-                pathSet.add(website[i]);
+                allRecodes[i] = new Recode(username[i], timestamp[i], website[i]);
             }
-            Arrays.sort(recodes);
+            Arrays.sort(allRecodes);
 
-            List<String> pathList = new ArrayList<>(pathSet);
+            Arrays.sort(website);
+            List<String> pathList = new ArrayList<>();
+            int pathSize = 0;
             Map<String, Integer> pathToCodes = new HashMap<>();
-            int pathSize = pathList.size();
-            for (int i = 0; i < pathSize; i++) {
-                pathToCodes.put(pathList.get(i), i);
+            for (String path : website) {
+                if (!pathToCodes.containsKey(path)) {
+                    pathToCodes.put(path, pathSize++);
+                    pathList.add(path);
+                }
             }
 
             Map<String, List<Integer>> userRecodes = new HashMap<>();
-            for (int i = 0; i < recodes.length; i++) {
-                Recode recode = recodes[i];
-                List<Integer> pathCodes = userRecodes.computeIfAbsent(recode.user, key -> new ArrayList<>());
+            for (Recode recode : allRecodes) {
+                List<Integer> pathCodes = userRecodes.get(recode.user);
+                if (pathCodes == null) {
+                    pathCodes = new ArrayList<>();
+                    userRecodes.put(recode.user, pathCodes);
+                }
                 pathCodes.add(pathToCodes.get(recode.path));
             }
 
             int maxCount = 0;
-            int maxCode = 0;
+            int minCode = Integer.MAX_VALUE;
             HashMap<Integer, Integer> recodeCounts = new HashMap<>();
-            for (Map.Entry<String, List<Integer>> entry : userRecodes.entrySet()) {
-                List<Integer> records = entry.getValue();
+            for (List<Integer> records : userRecodes.values()) {
                 Set<Integer> existed =  new HashSet<>();
                 for (int i = 0, size = records.size(); i < size - 2; i++) {
                     int codeI = records.get(i);
@@ -68,10 +80,14 @@ public class _1152_M {
                             int codeK = codeJ * pathSize + records.get(k);
                             if (!existed.contains(codeK)) {
                                 existed.add(codeK);
-                                Integer count = recodeCounts.merge(codeK, 1, (oldV, curV) -> oldV + curV);
+                                Integer count = recodeCounts.getOrDefault(codeK, 0);
+                                recodeCounts.put(codeK, ++count);
                                 if (count > maxCount) {
                                     maxCount = count;
-                                    maxCode = codeK;
+                                    minCode = codeK;
+                                }
+                                else if (count == maxCount && codeK < minCode) {
+                                    minCode = codeK;
                                 }
                             }
                         }
@@ -79,9 +95,9 @@ public class _1152_M {
                 }
             }
 
-            String keyK = pathList.get(maxCode % pathSize);
-            String keyJ = pathList.get(maxCode / pathSize % pathSize);
-            String keyI = pathList.get(maxCode / pathSize / pathSize);
+            String keyK = pathList.get(minCode % pathSize);
+            String keyJ = pathList.get(minCode / pathSize % pathSize);
+            String keyI = pathList.get(minCode / pathSize / pathSize);
             return Arrays.asList(keyI, keyJ, keyK);
         }
     }
@@ -90,13 +106,18 @@ public class _1152_M {
         Tester.test(
                 r(/*
                 ["Solution", "mostVisitedPattern"]
+                [[], [["dowg","dowg","dowg"],[158931262,562600350,148438945],["y","loedo","y"]]]
+                [null, ["y","y","loedo"]]
+                */),
+                r(/*
+                ["Solution", "mostVisitedPattern"]
                 [[], [["joe","joe","joe","james","james","james","james","mary","mary","mary"], [1,2,3,4,5,6,7,8,9,10], ["home","about","career","home","cart","maps","home","home","about","career"]]]
                 [null, ["home", "about", "career"]]
                 */),
                 r(/*
                 ["Solution", "mostVisitedPattern"]
                 [[], [["u1","u1","u1","u2","u2","u2"],[1,2,3,4,5,6],["a","b","c","a","b","a"]]]
-                [null, ["home", "about", "career"]]
+                [null, ["a", "b", "a"]]
                 */)
         );
     }
