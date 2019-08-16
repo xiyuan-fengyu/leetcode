@@ -10,9 +10,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * Created by xiyuan_fengyu on 2019/8/14 12:56.
@@ -35,16 +33,29 @@ public class Tester {
 
     }
 
-    public static long test(String callInputOutputs) {
-        return test(callInputOutputs, null, null);
+    public static long test(String ... callInputOutputs) {
+        return test(null, null, callInputOutputs);
     }
 
-    public static <T> long test(String callInputOutputs, SolutionInit<T> solutionInit) {
-        return test(callInputOutputs, solutionInit, null);
+    public static <T> long test(SolutionInit<T> solutionInit, String ... callInputOutputs) {
+        return test(solutionInit, null, callInputOutputs);
     }
 
-    public static <T> long test(String callInputOutputs, SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter) {
-        String[] split = callInputOutputs.split("\n");
+    private static <T> long test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String ... callInputOutputs) {
+        long totalCost = 0;
+        if (callInputOutputs != null && callInputOutputs.length > 0) {
+            for (String callInputOutput : callInputOutputs) {
+                totalCost += _test(solutionInit, paramConverter, callInputOutput);
+            }
+            if (callInputOutputs.length > 1) {
+                System.out.println("total cost: " + totalCost + "ms");
+            }
+        }
+        return totalCost;
+    }
+
+    private static <T> long _test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String callInputOutput) {
+        String[] split = callInputOutput.split("\n");
         List calls = null;
         List paramsArr = null;
         List outputs = null;
@@ -68,7 +79,7 @@ public class Tester {
         boolean allExecuted = false;
         List<Object> actualOutputs = new ArrayList<>();
         try {
-            System.out.println("test cases:\n" + callInputOutputs);
+            System.out.println("test cases:\n" + callInputOutput);
 
             T solution = null;
             for (int i = 0; i < size; i++) {
@@ -112,7 +123,7 @@ public class Tester {
                             paramsStr.append(j == 0 ? "" : ", ").append(objectMapper.writeValueAsString(params[j]));
                         }
                         if (!actualResultStr.equals(expectResultStr)) {
-                            failedCaseInfo = "case " + i + " check failed: " + methodName + "(" + paramsStr + ") expect: " + expectResultStr + " actual: " + actualResultStr;
+                            failedCaseInfo = "case " + i + " check failed: " + methodName + "(" + paramsStr + "), expect: " + expectResultStr + ", actual: " + actualResultStr;
                             break;
                         }
                     }
@@ -156,7 +167,7 @@ public class Tester {
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         Class wrapperClass = null;
         Class solutionClass = null;
-        for (int i = 2; i < stackTrace.length; i++) {
+        for (int i = 3; i < stackTrace.length; i++) {
             try {
                 solutionClass = Class.forName(stackTrace[i].getClassName() + "$" + solutionName);
                 wrapperClass = Class.forName(stackTrace[i].getClassName());
@@ -203,7 +214,13 @@ public class Tester {
                     constructor.setAccessible(true);
                     Object[] newParams = new Object[params.length + 1];
                     newParams[0] = wrapperClass.newInstance();
-                    System.arraycopy(params, 0, newParams, 1, params.length);
+                    if (params.length > 0) {
+                        Object[] convertedArgs = convertArgs(Arrays.copyOfRange(constructor.getParameterTypes(), 1, params.length + 1), params);
+                        if (convertedArgs == null) {
+                            continue;
+                        }
+                        System.arraycopy(convertedArgs, 0, newParams, 1, params.length);
+                    }
                     return (T) constructor.newInstance(newParams);
                 }
             }

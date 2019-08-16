@@ -4,7 +4,7 @@
 public class Playground {
 
     public static void main(String[] args) {
-        System.out.println(Math.ceil(Math.log(4) / Math.log(2)));
+        System.out.println(Math.pow(26L, 10) - 1);
     }
 
 }
