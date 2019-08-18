@@ -124,7 +124,7 @@ public class Tester {
                             paramsStr.append(j == 0 ? "" : ", ").append(objectMapper.writeValueAsString(params[j]));
                         }
                         if (!actualResultStr.equals(expectResultStr)) {
-                            failedCaseInfo = "case " + i + " check failed: " + methodName + "(" + paramsStr + "), expect: " + expectResultStr + ", actual: " + actualResultStr;
+                            failedCaseInfo = "case " + i + " check failed:\n" + methodName + "(" + paramsStr + ")\nexpect: " + expectResultStr + "\nactual: " + actualResultStr;
                             break;
                         }
                     }
