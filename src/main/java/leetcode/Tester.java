@@ -143,7 +143,7 @@ public class Tester {
 
         cost /= 1000000;
         if (failedCaseInfo != null) {
-            System.out.println("\u001B[38;05;91m" + failedCaseInfo + "\u001B[0m\n");
+            System.out.println("\u001B[38;05;1m" + failedCaseInfo + "\u001B[0m\n");
         }
         else if (allExecuted) {
             if (outputs != null) {
