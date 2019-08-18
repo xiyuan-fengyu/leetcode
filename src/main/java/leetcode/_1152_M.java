@@ -3,8 +3,6 @@ package leetcode;
 import com.xiyuan.templateString.EnableTemplateString;
 
 import java.util.*;
-import java.util.function.BiFunction;
-import java.util.function.Function;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
 

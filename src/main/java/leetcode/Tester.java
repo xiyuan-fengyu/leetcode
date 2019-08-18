@@ -41,7 +41,7 @@ public class Tester {
         return test(solutionInit, null, callInputOutputs);
     }
 
-    private static <T> long test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String ... callInputOutputs) {
+    public static <T> long test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String ... callInputOutputs) {
         long totalCost = 0;
         if (callInputOutputs != null && callInputOutputs.length > 0) {
             for (String callInputOutput : callInputOutputs) {
@@ -105,6 +105,7 @@ public class Tester {
                     Object[] methodAndConvertedArgs = findMethodAndConvertArgs(solution, methodName, paramConverted == null ? params : paramConverted);
                     if (methodAndConvertedArgs != null) {
                         method = (Method) methodAndConvertedArgs[0];
+                        method.setAccessible(true);
                         paramConverted = (Object[]) methodAndConvertedArgs[1];
                     }
 
@@ -253,11 +254,18 @@ public class Tester {
         return null;
     }
 
+    private static boolean isParamTypesMatch(Class<?> type, Object param) {
+        if (param == null) {
+            return !type.isPrimitive();
+        }
+        else return type.isAssignableFrom(param.getClass());
+    }
+
     private static Object[] convertArgs(Class[] classes, Object[] args) {
         Object[] convertedArgs = new Object[args.length];
         try {
             for (int i = 0; i < args.length; i++) {
-                convertedArgs[i] = convertArg(classes[i], args[i]);
+                convertedArgs[i] = isParamTypesMatch(classes[i], args[i]) ? args[i] : convertArg(classes[i], args[i]);
             }
         }
         catch (Exception e) {
