@@ -11,10 +11,10 @@ import static com.xiyuan.templateString.TemplateString.S.r;
  * https://leetcode-cn.com/contest/weekly-contest-150/problems/find-words-that-can-be-formed-by-characters/
  */
 @EnableTemplateString
-public class _5048_E {
+public class _1160_E {
 
     /*
-    5048. 拼写单词  显示英文描述
+    1160. 拼写单词  显示英文描述
     给你一份『词汇表』（字符串数组） words 和一张『字母表』（字符串） chars。
     假如你可以用 chars 中的『字母』（字符）拼写出 words 中的某个『单词』（字符串），那么我们就认为你掌握了这个单词。
     注意：每次拼写时，chars 中的每个字母都只能用一次。
