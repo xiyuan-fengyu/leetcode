@@ -35,43 +35,39 @@ public class _1153_H {
      */
 
     /**
-     * 解题思路 http://note.youdao.com/noteshare?id=214f587d7e7fa79cdd5fdaf39ba0630c&sub=36456EC3F53C47A29F8EA0D90177B2E4
+     * 解题思路
+     * 字母的转换一共有以下几种特殊情况
+     * 1. 转换前后字符串完全相等，可以转换
+     * 2. 下游分叉的一定不能转换
+     *  例如：a->b, a->c
+     * 3. 有空闲字母的一定可以转换
+     *  没有上游的字母就视为空闲字母，因为没有上游的字母可能没在转换链中出现，也可能在无环链末端(a->b->c->d,a空闲) 也可能在环链的上游侧链末端(a->b->c->d->a,f->e->a,f空闲)，后面两种经过转换后，末端的字母就会空闲出来
+     *  无环链自身可以从头到尾依次转换；有环链可以借助空闲字母完成转换
+     *  单独把1这种情况提出来，是因为 abcdefghijklmnopqrstuvwxyz -> abcdefghijklmnopqrstuvwxyz 这种情况所有字母的本身即为上游，没有空闲字母，所以要单独放在第一种情况来处理
      */
     class Solution {
 
         public boolean canConvert(String str1, String str2) {
             int len = str1.length();
-            if (len != str2.length()) {
-                return false;
-            }
-            if (len <= 1) {
+            if (len <= 1 || str1.equals(str2)) {
+                // 两个字符串完全相等时，会影响后面上游字母的判定，所以先在这里判断了
                 return true;
             }
 
             char[] chars1 = str1.toCharArray();
             char[] chars2 = str2.toCharArray();
 
-            // 迁移表
-            char[] table = new char['z' + 1];
-            // 第一次更新为上游字母，发现第二个上游字母后，将值更新为 1，用于后面用来判定环上是否存在上游侧链
+            // 记录下游情况，下游分叉则不可转换
+            char[] lowerReaches = new char['z' + 1];
+            // 记录上游情况，用来标记空闲字母，如果一个字母没有上游，则算作空闲字母(初始状态就是空闲的，或者经过一定步骤转换后可以变为空闲状态)
+            // 如果有空闲字母，且不存在下游分叉的情况，一定可以转换
             char[] upperReaches = new char['z' + 1];
-            // 下面 visited 用于辅助计算空闲字母数量
-            boolean[] visited = new boolean['z' + 1];
             int freeCharNum = 26;
             for (int i = 0; i < len; i++) {
                 char char1 = chars1[i];
                 char char2 = chars2[i];
 
-                if (!visited[char1]) {
-                    visited[char1] = true;
-                    freeCharNum--;
-                }
-                if (!visited[char2]) {
-                    visited[char2] = true;
-                    freeCharNum--;
-                }
-
-                if (table[char1] != 0 && table[char1] != char2) {
+                if (lowerReaches[char1] != 0 && lowerReaches[char1] != char2) {
                     // 该字母下游分叉，不可转换
                     return false;
                 }
@@ -79,59 +75,15 @@ public class _1153_H {
                     // 更新 char2 的上游字母情况
                     char upperReach = upperReaches[char2];
                     if (upperReach == 0) {
+                        if (--freeCharNum == 0) {
+                            return false;
+                        }
                         upperReaches[char2] = char1;
                     }
-                    else if (upperReach >= 'a' && upperReach != char1) {
-                        // 有上游侧链
-                        upperReaches[char2] = 1;
-                    }
-                    table[char1] = char2;
+                    // 更新 char2 的下游字母情况
+                    lowerReaches[char1] = char2;
                 }
             }
-
-            // 检查是否存在环
-            // 下面 visited 用于辅助记录哪些字母是访问过的
-            Arrays.fill(visited, false);
-            for (char i = 'a'; i <= 'z'; i++) {
-                if (visited[i]) {
-                    continue;
-                }
-                // 检测环的过程中记录是否有上游侧链
-                boolean hasUpperSideLine = false;
-                boolean hasCircle = false;
-                char nextC = i;
-                // 检查是否有环
-                while ((nextC = table[nextC]) != 0) {
-                    if (visited[nextC]) {
-                        // 已检查过的节点，认为可以走通转换流程
-                        break;
-                    }
-
-                    if (upperReaches[nextC] == 1)  {
-                        hasUpperSideLine = true;
-                    }
-
-                    if (nextC == i) {
-                        // 有环
-                        hasCircle = true;
-                        break;
-                    }
-
-                    visited[nextC] = true;
-                }
-                visited[i] = true;
-
-                if (hasCircle) {
-                    // 有环
-                    if (hasUpperSideLine || freeCharNum > 0) {
-                        // 存在上游侧链 或 有空闲字母，可以转换
-                    }
-                    else {
-                        return false;
-                    }
-                }
-            }
-
             return true;
         }
 
@@ -140,9 +92,9 @@ public class _1153_H {
     public static void main(String[] args) {
         Tester.test(
                 r(/*
-                ["Solution", "canConvert", "canConvert", "canConvert", "canConvert", "canConvert"]
-                [[], ["aabcc", "ccdee"], ["leetcode", "codeleet"], ["abcdefghijklmnopqrstuvwxyz", "zabcdefghijklmnopqrstuvwxy"], ["abcdefghijklmnopqrstuvwxyz", "bcdefghijklmnopqrstuvwxyzr"], ["abcdefghijklmnopqrstuvwxyz", "bcdefghijklmnopqrstuvwxyzq"]]
-                [null, true, false, false, true, true]
+                ["Solution", "canConvert", "canConvert", "canConvert", "canConvert", "canConvert", "canConvert"]
+                [[], ["aabcc", "ccdee"], ["leetcode", "codeleet"], ["abcdefghijklmnopqrstuvwxy", "bcdefghijkamnopqrstuvwxyz"], ["abcdefghijklmnopqrstuvwxyz", "zabcdefghijklmnopqrstuvwxy"], ["abcdefghijklmnopqrstuvwxyz", "bcdefghijklmnopqrstuvwxyzr"], ["abcdefghijklmnopqrstuvwxyz", "bcdefghijklmnopqrstuvwxyzq"]]
+                [null, true, false, true, false, true, true]
                 */)
         );
     }

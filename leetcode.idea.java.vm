@@ -3,9 +3,16 @@
 import com.xiyuan.templateString.EnableTemplateString;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
-#parse("File Header.java")
+/**
+ * Created by ${USER} on ${DATE} ${TIME}.
+ *
+ */
 @EnableTemplateString
 public class ${NAME} {
+
+    /*
+
+     */
 
     class Solution {
 
