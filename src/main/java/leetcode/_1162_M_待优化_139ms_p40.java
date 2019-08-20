@@ -12,7 +12,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
  * https://leetcode-cn.com/contest/weekly-contest-150/problems/as-far-from-land-as-possible/
  */
 @EnableTemplateString
-public class _1162_M {
+public class _1162_M_待优化_139ms_p40 {
 
     /*
     1162. 地图分析

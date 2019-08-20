@@ -46,7 +46,11 @@ public class _1160_E {
                 charCounts[c - 'a']++;
             }
             int res = 0;
+            int charsLen = chars.length();
             for (String word : words) {
+                if (word.length() > charsLen) {
+                    continue;
+                }
                 int[] tempCounts = Arrays.copyOf(charCounts, charCounts.length);
                 boolean containsAllChar = true;
                 for (char c : word.toCharArray()) {

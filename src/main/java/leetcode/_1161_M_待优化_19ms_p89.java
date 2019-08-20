@@ -13,7 +13,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
  * https://leetcode-cn.com/contest/weekly-contest-150/problems/maximum-level-sum-of-a-binary-tree/
  */
 @EnableTemplateString
-public class _1161_M {
+public class _1161_M_待优化_19ms_p89 {
 
     /*
     1161. 最大层内元素和
