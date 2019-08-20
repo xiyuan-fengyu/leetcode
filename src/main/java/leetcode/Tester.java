@@ -48,7 +48,7 @@ public class Tester {
                 totalCost += _test(solutionInit, paramConverter, callInputOutput);
             }
             if (callInputOutputs.length > 1) {
-                System.out.println("total cost: " + totalCost + "ms");
+                System.out.println("total cost: " + (totalCost / 1000000) + "ms");
             }
         }
         return totalCost;
@@ -142,13 +142,12 @@ public class Tester {
             e.printStackTrace();
         }
 
-        cost /= 1000000;
         if (failedCaseInfo != null) {
             System.out.println("\u001B[38;05;1m" + failedCaseInfo + "\u001B[0m\n");
         }
         else if (allExecuted) {
             if (outputs != null) {
-                System.out.println("all cases passed, cost: " + cost + "ms\n");
+                System.out.println("all cases passed, cost: " + (cost / 1000000) + "ms\n");
             }
             else {
                 String actualOutputsStr = "";
@@ -157,7 +156,7 @@ public class Tester {
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
-                System.out.println(actualOutputsStr +  "all cases executed, cost: " + cost + "ms\n");
+                System.out.println(actualOutputsStr +  "all cases executed, cost: " + (cost / 1000000) + "ms\n");
             }
         }
         return cost;
