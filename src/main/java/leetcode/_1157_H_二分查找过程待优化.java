@@ -11,7 +11,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
  * https://leetcode-cn.com/problems/online-majority-element-in-subarray/
  */
 @EnableTemplateString
-public class _1157_H {
+public class _1157_H_二分查找过程待优化 {
 
     /*
     1157. 子数组中占绝大多数的元素
