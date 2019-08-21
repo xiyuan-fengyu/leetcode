@@ -48,7 +48,7 @@ public class Tester {
                 totalCost += _test(solutionInit, paramConverter, callInputOutput);
             }
             if (callInputOutputs.length > 1) {
-                System.out.println("total cost: " + (totalCost / 1000000) + "ms");
+                System.out.println("total cost: " + (totalCost / 1000000) + "ms\n");
             }
         }
         return totalCost;
@@ -74,7 +74,8 @@ public class Tester {
             throw new IllegalArgumentException("different size between calls, params and outputs");
         }
 
-        long cost = 0;
+        long initCost = 0;
+        long casesCost = 0;
         String failedCaseInfo = null;
         boolean allExecuted = false;
         List<Object> actualOutputs = new ArrayList<>();
@@ -87,12 +88,17 @@ public class Tester {
                 Object[] params = objI instanceof List ? ((List) objI).toArray() : new Object[] {objI};
                 if (i == 0) {
                     if (solutionInit != null) {
+                        long now = System.nanoTime();
                         solution = solutionInit.apply((String) calls.get(i), params);
+                        initCost = System.nanoTime() - now;
                     }
                     else {
-                        solution = initSolution((String) calls.get(i), params);
+                        InitSolutionResult<T> initSolutionResult = initSolution((String) calls.get(i), params);
+                        solution = initSolutionResult.solution;
+                        initCost = initSolutionResult.cost;
                     }
                     actualOutputs.add(null);
+                    System.out.println("init solution successfully, cost: " + (initCost / 1000000) + "ms");
                 }
                 else {
                     String methodName = (String) calls.get(i);
@@ -115,7 +121,7 @@ public class Tester {
 
                     long now = System.nanoTime();
                     Object actualResult = method.invoke(solution, paramConverted);
-                    cost += System.nanoTime() - now;
+                    casesCost += System.nanoTime() - now;
                     if (outputs != null) {
                         String actualResultStr = objectMapper.writeValueAsString(actualResult);
                         String expectResultStr = objectMapper.writeValueAsString(outputs.get(i));
@@ -147,7 +153,7 @@ public class Tester {
         }
         else if (allExecuted) {
             if (outputs != null) {
-                System.out.println("all cases passed, cost: " + (cost / 1000000) + "ms\n");
+                System.out.println("all cases passed, cost: " + (casesCost / 1000000) + "ms\n");
             }
             else {
                 String actualOutputsStr = "";
@@ -156,14 +162,23 @@ public class Tester {
                 } catch (JsonProcessingException e) {
                     e.printStackTrace();
                 }
-                System.out.println(actualOutputsStr +  "all cases executed, cost: " + (cost / 1000000) + "ms\n");
+                System.out.println(actualOutputsStr +  "all cases executed, cost: " + (casesCost / 1000000) + "ms\n");
             }
         }
-        return cost;
+        return initCost + casesCost;
+    }
+
+    private static final class InitSolutionResult<T> {
+        T solution;
+        long cost;
+        public InitSolutionResult(T solution, long cost) {
+            this.solution = solution;
+            this.cost = cost;
+        }
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T initSolution(String solutionName, Object[] params) throws Exception {
+    private static <T> InitSolutionResult<T> initSolution(String solutionName, Object[] params) throws Exception {
         StackTraceElement[] stackTrace = new Exception().getStackTrace();
         Class wrapperClass = null;
         Class solutionClass = null;
@@ -181,7 +196,7 @@ public class Tester {
                     + ", you can set a lambda function to init the solution at the first parameter of Tester.test");
         }
 
-        T solution = tryInitSolution(wrapperClass, solutionClass, params);
+        InitSolutionResult solution = tryInitSolution(wrapperClass, solutionClass, params);
         if (solution == null) {
             // 尝试将 params 当成一个参数来初始化
             solution = tryInitSolution(wrapperClass, solutionClass, new Object[] {params});
@@ -195,7 +210,7 @@ public class Tester {
     }
 
     @SuppressWarnings("unchecked")
-    private static <T> T tryInitSolution(Class<?> wrapperClass, Class<?> solutionClass, Object[] params) {
+    private static <T> InitSolutionResult<T> tryInitSolution(Class<?> wrapperClass, Class<?> solutionClass, Object[] params) {
         try {
             boolean isSolutionClassStatic = Modifier.isStatic(solutionClass.getModifiers());
             Constructor[] constructors = solutionClass.getDeclaredConstructors();
@@ -205,7 +220,8 @@ public class Tester {
                         Object[] convertedArgs = convertArgs(constructor.getParameterTypes(), params);
                         if (convertedArgs != null) {
                             constructor.setAccessible(true);
-                            return (T) constructor.newInstance(convertedArgs);
+                            long now = System.nanoTime();
+                            return new InitSolutionResult<>((T) constructor.newInstance(convertedArgs), System.nanoTime() - now);
                         }
                     }
                 }
@@ -221,7 +237,8 @@ public class Tester {
                         }
                         System.arraycopy(convertedArgs, 0, newParams, 1, params.length);
                     }
-                    return (T) constructor.newInstance(newParams);
+                    long now = System.nanoTime();
+                    return new InitSolutionResult<>((T) constructor.newInstance(newParams), System.nanoTime() - now);
                 }
             }
         }
