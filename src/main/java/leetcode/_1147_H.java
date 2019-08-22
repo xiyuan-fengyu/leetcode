@@ -38,6 +38,11 @@ https://leetcode-cn.com/problems/longest-chunked-palindrome-decomposition/
 提示：
 text 仅由小写英文字符组成。
 1 <= text.length <= 1000
+
+关键字:
+指针
+回文串
+入栈出栈
  */
 
 /**
@@ -46,11 +51,86 @@ text 仅由小写英文字符组成。
 @EnableTemplateString
 public class _1147_H {
 
+    class Solution_1 {
+
+        public int longestDecomposition(String text) {
+            int len = text.length();
+            if (len <= 1) {
+                return 1;
+            }
+
+            char[] chars = text.toCharArray();
+            char[] stack = new char[len];
+            int count = 0;
+            int stackI = -1;
+            for (int left = 0, right; left < len; left++) {
+                right = len - 1 - left;
+                // left字母入栈，stackI右移
+                char cL = chars[left];
+                if (stackI == -1 || cL != stack[stackI]) {
+                    // 左字母入栈
+                    stack[++stackI] = cL;
+                }
+                else if (--stackI == -1) {
+                    // 出栈后，栈空，完成一次段式回文匹配
+                    count++;
+                }
+
+                char cR = chars[right];
+                if (stackI == -1 || cR != stack[stackI]) {
+                    // 右字母入栈
+                    stack[++stackI] = cR;
+                }
+                else if (--stackI == -1) {
+                    // 出栈后，栈空，完成一次段式回文匹配
+                    count++;
+                }
+            }
+            return count;
+        }
+
+    }
+
     class Solution {
 
         public int longestDecomposition(String text) {
+            int len = text.length();
+            if (len <= 1) {
+                return 1;
+            }
 
-            return 0;
+            char[] chars = text.toCharArray();
+            char[] stack = new char[len];
+            int count = 0;
+            int stackI = -1;
+            // 只用分析一半即可
+            for (int left = 0, right = len - 1, half = (len - 1) / 2; left <= half; left++, right--) {
+                // left字母入栈，stackI右移
+                char leftChar = chars[left];
+                if (stackI == -1 || leftChar != stack[stackI]) {
+                    // 左字母入栈
+                    stack[++stackI] = leftChar;
+                }
+                else {
+                    // 出栈
+                    --stackI;
+                }
+
+                char rightChar = chars[right];
+                if (stackI == -1 || rightChar != stack[stackI]) {
+                    // 右字母入栈
+                    stack[++stackI] = rightChar;
+                }
+                else if (--stackI == -1) {
+                    // 出栈后，栈空，完成一次段式回文匹配
+                    count += left == right ? 1 : 2;
+                }
+            }
+            if (stackI > -1) {
+                // 栈内有剩余元素，count需要加一
+                count++;
+            }
+            return count;
         }
 
     }
