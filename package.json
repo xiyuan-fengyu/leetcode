@@ -1,0 +1,9 @@
+{
+  "name": "leetcode",
+  "version": "1.0.0",
+  "dependencies": {
+  },
+  "devDependencies": {
+    "@types/node": "^12.7.2"
+  }
+}
