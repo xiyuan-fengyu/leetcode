@@ -1,26 +1,19 @@
 /**
  * 字符串模式匹配算法
- * Sunday
+ * Horspool
  *
- * abcdefghi
- * abca
- * e没有在abca中出现，abca需要向前移动5位
- * abcdefghi
- *      abca
- *
- * abcbcde
- * abcd
- * c在abcd中有出现，abcd需向前移动2位，使得c对齐
- * abcbcde
- *   abcd
+ * abcabcdefg
+ * abcdbcd
+ * 从后往前匹配，str(a)和pattern(d)不匹配，根据str中此时窗口最右边的字母d在pattern中从右往左下一个出现的位置(3)来决定移动的距离2
+ * abcabcdefg
+ *    abcdbcd
  */
-export class FindIndex_Sunday {
+export class FindIndex_Horspool {
 
     private static moveArr(pattern: string) {
-        // 计算一个字符在pattern中的最右边的位置距离最有边的距离
         const arr = [];
-        for (let i = 0, len = pattern.length; i < len; i++) {
-            arr[pattern.charCodeAt(i)] = len - i;
+        for (let i = 0, end = pattern.length - 2; i <= end; i++) {
+            arr[pattern.charCodeAt(i)] = pattern.length - i - 1;
         }
         return arr;
     }
@@ -41,15 +34,15 @@ export class FindIndex_Sunday {
         let matchI;
         const end = str.length - pattern.length;
         while (strI <= end) {
-            matchI = 0;
-            while (str.charCodeAt(strI + matchI) == pattern.charCodeAt(matchI) && matchI < pattern.length) {
-                matchI++;
+            matchI = pattern.length - 1;
+            while (str.charCodeAt(strI + matchI) == pattern.charCodeAt(matchI) && matchI >= 0) {
+                matchI--;
             }
-            if (matchI == pattern.length) {
+            if (matchI == -1) {
                 return strI;
             }
             else {
-                const move = moves[str.charCodeAt(strI + pattern.length)];
+                const move = moves[str.charCodeAt(strI + pattern.length - 1)];
                 strI += move != null ? move : pattern.length;
             }
         }

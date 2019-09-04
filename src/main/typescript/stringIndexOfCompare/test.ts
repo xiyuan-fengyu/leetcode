@@ -2,6 +2,7 @@ import {FindIndex_KR} from "./FindIndex_KR";
 import {FindIndex_BF} from "./FindIndex_BF";
 import {FindIndex_KMP} from "./FindIndex_KMP";
 import {FindIndex_Sunday} from "./FindIndex_Sunday";
+import {FindIndex_Horspool} from "./FindIndex_Horspool";
 
 function randomStr(len: number) {
     const chars = "0123456789abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -34,23 +35,11 @@ for (let i = 0; i < testNum; i++) {
 
 const solutions = [
     FindIndex_BF,
-    FindIndex_KR,
     FindIndex_KMP,
-    FindIndex_Sunday
+    FindIndex_KR,
+    FindIndex_Horspool,
+    FindIndex_Sunday,
 ];
-
-for (let solution of solutions) {
-    let startTime = new Date().getTime();
-    for (let testCase of testCases) {
-        solution.find(testCase.str, testCase.pattern);
-        // const index = solution.find(testCase.str, testCase.pattern);
-        // if (index != testCase.index) {
-        //     console.log(`${solution.name}.find(${JSON.stringify(testCase.str)}, ${JSON.stringify(testCase.pattern)}) = ${index} != ${testCase.index}`);
-        //     process.exit(-1);
-        // }
-    }
-    console.log(`${solution.name} cost: ${new Date().getTime() - startTime}ms`);
-}
 
 {
     let startTime = new Date().getTime();
@@ -58,4 +47,16 @@ for (let solution of solutions) {
         testCase.str.indexOf(testCase.pattern);
     }
     console.log(`String.indexOf cost: ${new Date().getTime() - startTime}ms`);
+}
+for (let solution of solutions) {
+    let startTime = new Date().getTime();
+    for (let testCase of testCases) {
+        (solution as any).find(testCase.str, testCase.pattern);
+        // const index = solution.find(testCase.str, testCase.pattern);
+        // if (index != testCase.index) {
+        //     console.log(`${solution.name}.find(${JSON.stringify(testCase.str)}, ${JSON.stringify(testCase.pattern)}) = ${index} != ${testCase.index}`);
+        //     process.exit(-1);
+        // }
+    }
+    console.log(`${solution.name} cost: ${new Date().getTime() - startTime}ms`);
 }
