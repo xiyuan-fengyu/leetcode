@@ -36,15 +36,12 @@ export class FindIndex_Horspool {
         while (strI <= end) {
             matchI = pattern.length - 1;
             while (str.charCodeAt(strI + matchI) == pattern.charCodeAt(matchI) && matchI >= 0) {
-                matchI--;
+                if (--matchI < 0) {
+                    return strI;
+                }
             }
-            if (matchI == -1) {
-                return strI;
-            }
-            else {
-                const move = moves[str.charCodeAt(strI + pattern.length - 1)];
-                strI += move != null ? move : pattern.length;
-            }
+            const move = moves[str.charCodeAt(strI + pattern.length - 1)];
+            strI += move != null ? move : pattern.length;
         }
         return -1;
     }

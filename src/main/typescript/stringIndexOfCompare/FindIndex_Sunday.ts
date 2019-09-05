@@ -43,15 +43,12 @@ export class FindIndex_Sunday {
         while (strI <= end) {
             matchI = 0;
             while (str.charCodeAt(strI + matchI) == pattern.charCodeAt(matchI) && matchI < pattern.length) {
-                matchI++;
+                if (++matchI == pattern.length) {
+                    return strI;
+                }
             }
-            if (matchI == pattern.length) {
-                return strI;
-            }
-            else {
-                const move = moves[str.charCodeAt(strI + pattern.length)];
-                strI += move != null ? move : pattern.length;
-            }
+            const move = moves[str.charCodeAt(strI + pattern.length)];
+            strI += move != null ? move : pattern.length;
         }
         return -1;
     }

@@ -16,16 +16,15 @@ export class FindIndex_BF {
         }
 
         for (let i = 0, end = str.length - pattern.length; i <= end; i++) {
-            let match = true;
-            for (let j = 0; j < pattern.length; j++) {
+            let j = 0;
+            do {
                 if (str.charCodeAt(i + j) != pattern.charCodeAt(j)) {
-                    match = false;
                     break;
                 }
-            }
-            if (match) {
-                return i;
-            }
+                if (++j == pattern.length) {
+                    return i;
+                }
+            } while (true);
         }
         return -1;
     }

@@ -21,9 +21,9 @@ export class FindIndex_KMP {
         for (let i = 1, j = 0; i < pattern.length; i++) {
             const charI = pattern.charCodeAt(i);
             while (j > 0 && charI != pattern.charCodeAt(j)) {
-                j = next[j - 1];
+                j = next[ j - 1];
             }
-            next.push(j == 0 && charI != char0 ? 0 : ++j);
+            next.push(j > 0 || char0 == charI ? ++j : 0);
         }
         return next;
     }
@@ -46,7 +46,7 @@ export class FindIndex_KMP {
             while (j > 0 && charI != pattern.charCodeAt(j)) {
                 j = next[j - 1];
             }
-            if (j != 0 || charI == char0) {
+            if (j > 0 || char0 == charI) {
                 if (++j == pattern.length) {
                     return i - j + 1;
                 }
