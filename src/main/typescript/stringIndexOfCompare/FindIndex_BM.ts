@@ -44,7 +44,7 @@ export class FindIndex_BM {
 
         const arr = new Array(len);
         arr.fill(len);
-        for (let i = len - 1, j = 0; i >= 0; i--) {
+        for (let i = len - 2, j = 0; i >= 0; i--) {
             if (suffix[i] == i + 1) {
                 // 前缀 = 后缀
                 for (; j < len - 1 - i; j++) {

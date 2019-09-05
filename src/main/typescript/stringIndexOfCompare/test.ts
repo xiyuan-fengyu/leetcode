@@ -54,12 +54,12 @@ const testResults = [];
 for (let solution of solutions) {
     let startTime = new Date().getTime();
     for (let testCase of testCases) {
-        solution.find(testCase.str, testCase.pattern);
-        // const index = solution.find(testCase.str, testCase.pattern);
-        // if (index != testCase.index) {
-        //     console.log(`${solution.name}.find(${JSON.stringify(testCase.str)}, ${JSON.stringify(testCase.pattern)}) = ${index} != ${testCase.index}`);
-        //     process.exit(-1);
-        // }
+        // solution.find(testCase.str, testCase.pattern);
+        const index = solution.find(testCase.str, testCase.pattern);
+        if (index != testCase.index) {
+            console.log(`${solution.name}.find(${JSON.stringify(testCase.str)}, ${JSON.stringify(testCase.pattern)}) = ${index} != ${testCase.index}`);
+            process.exit(-1);
+        }
     }
     testResults.push({solution: solution.name, cost: new Date().getTime() - startTime});
 }
