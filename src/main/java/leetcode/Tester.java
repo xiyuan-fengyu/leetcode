@@ -33,19 +33,22 @@ public class Tester {
 
     }
 
+    @FunctionalInterface
+    public interface SolutionResultConverter<T> {
+
+        Object apply(T solution, String methodName, Object res) throws Exception;
+
+    }
+
     public static long test(String ... callInputOutputs) {
-        return test(null, null, callInputOutputs);
+        return test(null, null, null, callInputOutputs);
     }
 
-    public static <T> long test(SolutionInit<T> solutionInit, String ... callInputOutputs) {
-        return test(solutionInit, null, callInputOutputs);
-    }
-
-    public static <T> long test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String ... callInputOutputs) {
+    public static <T> long test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, SolutionResultConverter<T> resConverter, String ... callInputOutputs) {
         long totalCost = 0;
         if (callInputOutputs != null && callInputOutputs.length > 0) {
             for (String callInputOutput : callInputOutputs) {
-                totalCost += _test(solutionInit, paramConverter, callInputOutput);
+                totalCost += _test(solutionInit, paramConverter, resConverter, callInputOutput);
             }
             if (callInputOutputs.length > 1) {
                 System.out.println("total cost: " + (totalCost / 1000000) + "ms\n");
@@ -54,7 +57,7 @@ public class Tester {
         return totalCost;
     }
 
-    private static <T> long _test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, String callInputOutput) {
+    private static <T> long _test(SolutionInit<T> solutionInit, SolutionParamsConverter<T> paramConverter, SolutionResultConverter<T> resConverter, String callInputOutput) {
         String[] split = callInputOutput.split("\n");
         List calls = null;
         List paramsArr = null;
@@ -122,6 +125,9 @@ public class Tester {
                     long now = System.nanoTime();
                     Object actualResult = method.invoke(solution, paramConverted);
                     casesCost += System.nanoTime() - now;
+                    if (resConverter != null) {
+                        actualResult = resConverter.apply(solution, methodName, actualResult);
+                    }
                     if (outputs != null) {
                         String actualResultStr = objectMapper.writeValueAsString(actualResult);
                         String expectResultStr = objectMapper.writeValueAsString(outputs.get(i));

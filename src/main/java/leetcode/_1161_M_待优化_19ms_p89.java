@@ -96,10 +96,12 @@ public class _1161_M_待优化_19ms_p89 {
     }
 
     public static void main(String[] args) {
-        Tester.test(null, (solution, methodName, params) -> new Object[] {
+        Tester.test(
+                null,
+                (solution, methodName, params) -> new Object[] {
                     build(Arrays.stream(params).toArray(Integer[]::new))
                 },
-
+                null,
                 r(/*
                 ["Solution", "maxLevelSum"]
                 [[],[1,7,0,7,-8,null,null]]

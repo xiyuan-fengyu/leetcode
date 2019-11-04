@@ -1,6 +1,7 @@
-package leetcode;
+package _408试题;
 
 import com.xiyuan.templateString.EnableTemplateString;
+import leetcode.Tester;
 
 import static com.xiyuan.templateString.TemplateString.S.r;
 
@@ -8,7 +9,7 @@ import static com.xiyuan.templateString.TemplateString.S.r;
  * Created by xiyuan_fengyu on 2019/11/1 17:38.
  */
 @EnableTemplateString
-public class MajorNum {
+public class _2013_MajorNum {
 
     class Solution {
 
