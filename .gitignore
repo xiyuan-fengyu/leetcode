@@ -2,6 +2,6 @@
 /.idea/
 *.iml
 /target/
-
+/cmake-build-debug/
 /node_modules/
 yarn.lock

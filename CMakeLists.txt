@@ -1,0 +1,9 @@
+cmake_minimum_required(VERSION 3.6.2)
+
+project(leetcode)
+
+set(CMAKE_CXX_STANDARD 14)
+
+include_directories(src/main/c++/)
+
+add_executable(AbsentMini src/main/c++/_2018_AbsentMini.cpp)
