@@ -8,3 +8,4 @@ include_directories(src/main/c++/)
 
 add_executable(AbsentMini src/main/c++/_408/_2018_AbsentMini.cpp)
 add_executable(LinkNodeReorder src/main/c++/_408/_2019_LinkNodeReorder.cpp)
+add_executable(MidExp src/main/c++/_408/_2017_MidExp.cpp)
