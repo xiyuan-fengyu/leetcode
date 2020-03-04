@@ -1,4 +1,3 @@
-#include <iostream>
 #include <vector>
 #include <unordered_map>
 
@@ -16,6 +15,6 @@ public:
             }
             existed[num] = i;
         }
-        return vector<int>{-1, -1};
+        return {-1, -1};
     }
 };
