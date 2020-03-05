@@ -10,3 +10,5 @@ add_executable(AbsentMini src/main/c++/_408/_2018_AbsentMini.cpp)
 add_executable(LinkNodeReorder src/main/c++/_408/_2019_LinkNodeReorder.cpp)
 add_executable(MidExp src/main/c++/_408/_2017_MidExp.cpp)
 add_executable(RomoveAbsDup src/main/c++/_408/_2015_RemoveAbsDup.cpp)
+
+add_executable(_3_M src/main/c++/leetcode/_3_M.cpp)
