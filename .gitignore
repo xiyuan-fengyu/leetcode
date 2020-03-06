@@ -6,6 +6,6 @@
 /c++/.idea/
 /c++/cmake-build-debug/
 java/target
-/typescript/lib/
-/typescript/node_modules/
-/typescript/yarn.lock
+/javascript/lib/
+/javascript/node_modules/
+/javascript/yarn.lock
