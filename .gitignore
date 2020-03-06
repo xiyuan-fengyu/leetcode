@@ -1,7 +1,8 @@
 # Created by .ignore support plugin (hsz.mobi)
 /.idea/
-*.iml
-/target/
-/cmake-build-debug/
-/node_modules/
-yarn.lock
+/*.iml
+/**/*.iml
+/c++/cmake-build-debug/
+/typescript/lib/
+/typescript/node_modules/
+/typescript/yarn.lock

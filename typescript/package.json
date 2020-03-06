@@ -1,6 +1,7 @@
 {
   "name": "leetcode",
   "version": "1.0.0",
+  "author": "xiyuan_fengyu <xiyuan_fengyu@163.com> (https://github.com/xiyuan-fengyu)",
   "dependencies": {
   },
   "devDependencies": {
