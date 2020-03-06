@@ -12,3 +12,4 @@ add_executable(MidExp src/_408/_2017_MidExp.cpp)
 add_executable(RomoveAbsDup src/_408/_2015_RemoveAbsDup.cpp)
 
 add_executable(_3_M src/leetcode/_3_M.cpp)
+add_executable(_4_H src/leetcode/_4_H.cpp)
