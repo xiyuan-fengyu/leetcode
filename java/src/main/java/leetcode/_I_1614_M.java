@@ -112,7 +112,7 @@ len(Points[i]) = 2
         }
     }
 
-    // 两个点构成一条直线，然后检测后面的点是否在这条线上
+    // 固定一个点，然后检测后面的点，如果斜率一样，则共线
     class Solution {
         public int[] bestLine(int[][] points) {
             int[] best = {0, 1};
